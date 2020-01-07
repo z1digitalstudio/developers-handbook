@@ -27,3 +27,7 @@
 - Always follow [convetional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.2/) for your commit messages.
 
   *Why?*: Verbose git history.
+
+### [Clean code](#clean-code)
+
+### [React](#react)
