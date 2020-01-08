@@ -47,6 +47,15 @@
 ###### [Rule [G009](#rule-g009)]
 - Merge branches via pull request.
 
+###### [Rule [G010](#rule-g010)]
+- Resolve conflicts on your pull requests by yourself.
+
+  *Why?*: It's your responsability.
+
+  *Why?*: You have more context about your code.
+
+  **Tips**: Always merge parent branch on your branch before creating a pull request.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
