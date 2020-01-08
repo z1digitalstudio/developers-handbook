@@ -24,6 +24,8 @@
 
   *Why?*: The less changes you want to merge, the easier it will be to review them.
 
+  **Tips**: Avoid mixing code format with features.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
