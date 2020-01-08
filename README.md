@@ -19,6 +19,11 @@
 ###### [Rule [G005](#rule-g005)]
 - New branch must start from 'develop'. If you need some code from other branch still not merged, this new branch should start from the dependent branch.
 
+###### [Rule [G006](#rule-g006)]
+- Each branch should be a single feature or bug fix (as small as possible).
+
+  *Why?*: The less changes you want to merge, the easier it will be to review them.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
