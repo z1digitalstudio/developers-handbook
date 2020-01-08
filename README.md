@@ -65,6 +65,14 @@
 
   **Tips**: Add screen recording to the pull request description.
 
+###### [Rule [G012](#rule-g012)]
+- Avoid treating reviewers as bots.
+
+  *Why?*: They are people!
+
+  *Why?*: Their time is valuable.
+
+  *Why?*: Your pull request is your responsability.
 
 ### [Clean code](#clean-code)
 
