@@ -39,6 +39,11 @@
 
   **Tips**: Whenever you reach to the word “and” in your commit message, you know your commit is too big.
 
+###### [Rule [G008](#rule-g008)]
+- Merge branches with their parents branches.
+
+  *Why?*: Avoid conflicts.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
