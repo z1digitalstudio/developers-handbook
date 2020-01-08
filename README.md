@@ -1,5 +1,10 @@
 # Z1 Developer's Handbook
 
+## Introduction
+*Opinionated developers best practices style guide for teams by [@z1digitalstudio](//twitter.com/z1digitalstudio)*
+
+If you are looking for an opinionated style guide for syntax, conventions, best practices and structuring applications, then step right in. These rules are based on our development experience [building incredible products](https://z1.digital/work).
+
 ### [Version Control](#version-control)
 ###### [Rule [G000](#rule-g000)]
 - Use [Git](https://git-scm.com/) as version control.
