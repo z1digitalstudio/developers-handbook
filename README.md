@@ -26,6 +26,19 @@
 
   **Tips**: Avoid mixing code format with features.
 
+###### [Rule [G007](#rule-g007)]
+- Commit early and often following [convetional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.2/).
+
+  *Why?*: Your commits should follow the SRP (Single Responsibilty Principle). Your commit should change one thing.
+
+  *Why?*: Makes your commit messages more accurate.
+
+  *Why?*: Verbose git history.
+
+  *Why?*: Make reverting commits useful.
+
+  **Tips**: Whenever you reach to the word “and” in your commit message, you know your commit is too big.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
