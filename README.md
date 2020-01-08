@@ -50,7 +50,7 @@
 ###### [Rule [G010](#rule-g010)]
 - Resolve conflicts on your pull requests by yourself.
 
-  *Why?*: It's your responsability.
+  *Why?*: It's your responsibility.
 
   *Why?*: You have more context about your code.
 
@@ -59,7 +59,7 @@
 ###### [Rule [G011](#rule-g011)]
 - Check that your pull request is doing what you think.
 
-  *Why?*: It's your responsability.
+  *Why?*: It's your responsibility.
 
   *Why?*: You have more context about the feature requirements.
 
@@ -72,7 +72,7 @@
 
   *Why?*: Their time is valuable.
 
-  *Why?*: Your pull request is your responsability.
+  *Why?*: Your pull request is your responsibility.
 
 ###### [Rule [G013](#rule-g013)]
 - Avoid merging your own pull request.
