@@ -44,6 +44,9 @@
 
   *Why?*: Avoid conflicts.
 
+###### [Rule [G009](#rule-g009)]
+- Merge branches via pull request.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
