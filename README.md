@@ -56,6 +56,16 @@
 
   **Tips**: Always merge parent branch on your branch before creating a pull request.
 
+###### [Rule [G011](#rule-g011)]
+- Check that your pull request is doing what you think.
+
+  *Why?*: It's your responsability.
+
+  *Why?*: You have more context about the feature requirements.
+
+  **Tips**: Add screen recording to the pull request description.
+
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
