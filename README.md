@@ -5,6 +5,9 @@
 
 If you are looking for an opinionated style guide for syntax, conventions, best practices and structuring applications, then step right in. These rules are based on our development experience [building incredible products](https://z1.digital/work).
 
+## Purpose
+[TODO]
+
 ## Table of Contents
   1. [Version Control](#version-control)
   1. [Clean code](#clean-code)
