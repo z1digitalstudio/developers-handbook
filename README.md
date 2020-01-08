@@ -5,7 +5,12 @@
 
 If you are looking for an opinionated style guide for syntax, conventions, best practices and structuring applications, then step right in. These rules are based on our development experience [building incredible products](https://z1.digital/work).
 
-### [Version Control](#version-control)
+## Table of Contents
+  1. [Version Control](#version-control)
+  1. [Clean code](#clean-code)
+  1. [React](#react)
+
+## [Version Control](#version-control) [WIP]
 ###### [Rule [G000](#rule-g000)]
 - Use [Git](https://git-scm.com/) as version control.
 
@@ -82,6 +87,6 @@ If you are looking for an opinionated style guide for syntax, conventions, best 
 ###### [Rule [G013](#rule-g013)]
 - Avoid merging your own pull request.
 
-### [Clean code](#clean-code)
+## [Clean code](#clean-code) [Not Started]
 
-### [React](#react)
+## [React](#react) [Not Started]
