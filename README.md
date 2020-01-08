@@ -8,16 +8,16 @@
 - Use [GitHub](https://github.com/z1digitalstudio) for hosting source code.
 
 ###### [Rule [G002](#rule-g002)]
-- Each commit should be a single feature or bug fix.
-
-  *Why?*: Makes your commit messages more accurate.
-
-  *Why?*: Makes git-revert more useful.
+- 'Master' branch should contain the production version of the code. It hasn't parent branch.
 
 ###### [Rule [G003](#rule-g003)]
-- Follow [convetional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.2/) for your commit messages.
+- 'Develop' branch should contain the staging version of the code. 'Master' is his parent branch.
 
-  *Why?*: Verbose git history.
+###### [Rule [G004](#rule-g004)]
+- Avoid push to 'master' or 'develop' directly. Always create a new branch and then a pull request.
+
+###### [Rule [G005](#rule-g005)]
+- New branch must start from 'develop'. If you need some code from other branch still not merged, this new branch should start from the dependent branch.
 
 ### [Clean code](#clean-code)
 
