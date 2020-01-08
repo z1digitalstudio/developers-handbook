@@ -74,6 +74,9 @@
 
   *Why?*: Your pull request is your responsability.
 
+###### [Rule [G013](#rule-g013)]
+- Avoid merging your own pull request.
+
 ### [Clean code](#clean-code)
 
 ### [React](#react)
