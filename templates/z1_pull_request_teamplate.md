@@ -11,4 +11,4 @@
 ### Description
 Please add some context about your PR and screenshot/screen recording if it's possible.
 
-💔Thank you and happyy coding!
+💔Thank you and happy coding!
