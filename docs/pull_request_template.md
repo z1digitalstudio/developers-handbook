@@ -1,14 +1,19 @@
-### Your checklist for this pull request
-🚨Please remember review the [developers handbook](https://github.com/z1digitalstudio/developers-handbook).
+<!--- Provide a general summary of your changes in the Title above -->
 
-- [ ] **CONSIDER** adding a tests if your PR resolves an issue.
-- [ ] **DO** keep pull requests small so they can be easily reviewed. [g006](https://github.com/z1digitalstudio/developers-handbook#rule-g006)
-- [ ] **DO** make sure the commit's or even all commit's message styles matches our requested structure. [g007](https://github.com/z1digitalstudio/developers-handbook#rule-g007)
-- [ ] **DO** make sure your code additions will fail neither code linting checks nor unit test.  
-- [ ] **DO** make sure not to introduce any compiler warnings.
-- [ ] **DO** make sure you have manually checked that your code is doing what you think.
+## Description
+<!--- Describe your changes -->
 
-### Description
-Please add some context about your PR and screenshot/screen recording if it's possible.
+## How Has This Been Tested?
+<!--- Please describe how you tested your changes. -->
+<!--- Include details like browsers and remember to -->
+<!--- see how your change affects other areas. -->
+<!--- Add screenshots or screen recording if appropriate. -->
 
-💔Thank you and happy coding!
+## Checklist:
+<!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
+<!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
+- [ ] My pull requests is small enough so it can be easily reviewed. [g006](https://github.com/z1digitalstudio/developers-handbook#rule-g006) 
+- [ ] All my commits or even all commits message styles matches our requested structure. [g007](https://github.com/z1digitalstudio/developers-handbook#rule-g007)
+- [ ] My code is not introducing any compiler warnings.
+- [ ] My code compile properly.
+- [ ] My code doesn't break unit tests or linting checks.
