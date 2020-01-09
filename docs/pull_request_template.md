@@ -1,15 +1,15 @@
 <!--- Provide a general summary of your changes in the Title above -->
 
-## Description
+## 📝 Description
 <!--- Describe your changes -->
 
-## How Has This Been Tested?
+## 🚨 How Has This Been Tested?
 <!--- Please describe how you tested your changes. -->
 <!--- Include details like browsers and remember to -->
 <!--- see how your change affects other areas. -->
 <!--- Add screenshots or screen recording if appropriate. -->
 
-## Checklist:
+## ✅ Checklist:
 <!--- Go over all the following points, and put an `x` in all the boxes that apply. -->
 <!--- If you're unsure about any of these, don't hesitate to ask. We're here to help! -->
 - [ ] My pull requests is small enough so it can be easily reviewed. [g006](https://github.com/z1digitalstudio/developers-handbook#rule-g006) 
