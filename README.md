@@ -12,6 +12,7 @@ If you are looking for an opinionated style guide for syntax, conventions, best 
   1. [Version Control](#version-control)
   1. [Clean code](#clean-code)
   1. [React](#react)
+  1. [Typescript](#typescript)
 
 ## [Version Control](#version-control) [WIP]
 ###### [Rule [G000](#rule-g000)]
@@ -92,4 +93,6 @@ If you are looking for an opinionated style guide for syntax, conventions, best 
 
 ## [Clean code](#clean-code) [Not Started]
 
-## [React](#react) [Not Started]
+## [React](#react) [WIP]
+
+## [Typescript](#typescript) [WIP]
