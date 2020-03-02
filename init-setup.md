@@ -2,14 +2,14 @@
 
 ## Requirements 
 
-- [NVM (Node Version Manager)](#nvm-section) 
-- [Node](#node-section)
-- [Yarn Package Manager](#yarn-section)
-- [SSH Key](#ssh-key-section)
+- [NVM (Node Version Manager)](#nvm) 
+- [Node](#node)
+- [Yarn Package Manager](#yarn-package-manager)
+- [SSH Key](#ssh-key)
 
 ## How-to
 
-<a name = 'nvm-section'>### NVM</a>
+### NVM
 
 First, execute this command but check latest NVM version before and change url in case there is a new version:
 
@@ -25,7 +25,7 @@ echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.b
 
 [Link to docs](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-<a name = 'node-section'>### Node</a>
+### Node
 
 ```
 nvm install node
@@ -37,13 +37,13 @@ nvm install node
 node -v
 ```
 
-<a name = 'yarn-section'>### Yarn Package Manager</a>
+### Yarn Package Manager
 
 ```
 npm install -g yarn
 ```
 
-<a name = 'ssh-key-section'>### SSH Key</a>
+### SSH Key
 
 Follow the instructions in [the following link](https://help.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh) to generate a SSH Key.
 
