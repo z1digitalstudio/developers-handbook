@@ -20,7 +20,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash
 Then:
 
 ``` 
-echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.bash_profile && echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >> ~/.zshrc
+touch ~/.zshrc & echo 'source "$HOME/.nvm/nvm.sh"' >> ~/.zshrc
 ```
 
 [Link to docs](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
