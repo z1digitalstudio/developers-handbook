@@ -17,7 +17,7 @@ First, execute this command but check latest NVM version before and change url i
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.2/install.sh | bash 
 ```
 
-Then:
+**NOTE:** if you are using ZSH as default command interpreter you need to execute following command:
 
 ``` 
 touch ~/.zshrc & echo 'source "$HOME/.nvm/nvm.sh"' >> ~/.zshrc
