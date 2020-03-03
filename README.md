@@ -1,99 +1,19 @@
-# Z1 Developer's Handbook
+# Z1 Developers Handbook
 
 ## Introduction
-*Opinionated developers best practices style guide for teams by [@z1digitalstudio](//twitter.com/z1digitalstudio)*
 
-If you are looking for an opinionated style guide for syntax, conventions, best practices and structuring applications, then step right in. These rules are based on our development experience [building incredible products](https://z1.digital/work).
+Opinionated style guide for syntax, conventions, best practices and technical decisions for teams by [@z1digitalstudio](//twitter.com/z1digitalstudio). These rules are based on our development experience [building more than 50 products](https://z1.digital/work) in the last 5 years.
 
-## Purpose
-[TODO]
+**If you are a client or you are interested in working with us**  
+As developers, we understand that your technical team need more than a [portfolio](https://z1.digital/work) for being sure that we are the best option.
 
-## Table of Contents
-  1. [Version Control](#version-control)
-  1. [Clean code](#clean-code)
-  1. [React+Typescript](#react-plus-typescript)
+**If you are a developer interested in joining our team**  
+We have been in your situation before and we know that sometimes is not enough only with the [career page](https://z1.digital/careers). You are a developer and you want to know more about code and best practices.
 
-## [Version Control](#version-control) [WIP]
-###### [Rule [G000](#rule-g000)]
-- Use [Git](https://git-scm.com/) as version control.
+**If you are a Z1 developer**   
+We hope that this repo makes your coding easier on a daily basis.
 
-###### [Rule [G001](#rule-g001)]
-- Use [GitHub](https://github.com/z1digitalstudio) for hosting source code.
-
-###### [Rule [G002](#rule-g002)]
-- 'Master' branch should contain the production version of the code. It hasn't parent branch.
-
-###### [Rule [G003](#rule-g003)]
-- 'Develop' branch should contain the staging version of the code. 'Master' is his parent branch.
-
-###### [Rule [G004](#rule-g004)]
-- Avoid pushing to 'master' or 'develop' directly. Always create a new branch and then a pull request.
-
-###### [Rule [G005](#rule-g005)]
-- New branch must start from 'develop'. If you need some code from other branch still not merged, this new branch should start from the dependent branch.
-
-###### [Rule [G006](#rule-g006)]
-- Each branch should be a single feature or bug fix (as small as possible).
-
-  *Why?*: The less changes you want to merge, the easier it will be to review them.
-
-  **Tips**: Avoid mixing code format with features.
-
-###### [Rule [G007](#rule-g007)]
-- Commit early and often following [convetional commits](https://www.conventionalcommits.org/en/v1.0.0-beta.2/).
-
-  *Why?*: Your commits should follow the SRP (Single Responsibilty Principle). Your commit should change one thing.
-
-  *Why?*: Makes your commit messages more accurate.
-
-  *Why?*: Verbose git history.
-
-  *Why?*: Make reverting commits useful.
-
-  **Tips**: Whenever you reach to the word “and” in your commit message, you know your commit is too big.
-
-###### [Rule [G008](#rule-g008)]
-- Merge branches with their parents branches.
-
-  *Why?*: Avoid conflicts.
-
-###### [Rule [G009](#rule-g009)]
-- Merge branches via pull request.
-
-###### [Rule [G010](#rule-g010)]
-- Resolve conflicts on your pull requests by yourself.
-
-  *Why?*: It's your responsibility.
-
-  *Why?*: You have more context about your code.
-
-  **Tips**: Always merge parent branch on your branch before creating a pull request.
-
-###### [Rule [G011](#rule-g011)]
-- Check that your pull request is doing what you think.
-
-  *Why?*: It's your responsibility.
-
-  *Why?*: You have more context about the feature requirements.
-
-  **Tips**: Add screen recording to the pull request description.
-
-###### [Rule [G012](#rule-g012)]
-- Avoid treating reviewers as bots.
-
-  *Why?*: They are people!
-
-  *Why?*: Their time is valuable.
-
-  *Why?*: Your pull request is your responsibility.
-
-###### [Rule [G013](#rule-g013)]
-- Avoid merging your own pull request.
-
-## [Clean code](#clean-code) [Not Started]
-
-## [React+TypeScript](#react-plus-typescript) [WIP]
-###### [Rule [RT000](#rule-g000)]
-- Use functional components over class components.
-
-  *Why?*:
+## Sections
+* [Setup your mac](https://github.com/z1digitalstudio/developers-handbook/blob/master/setup-mac.md)
+* [Setup your IDE](https://github.com/z1digitalstudio/developers-handbook/blob/master/setup-ide.md)
+* [Best practices](https://github.com/z1digitalstudio/developers-handbook/blob/master/best-practices.md)
