@@ -11,8 +11,7 @@ If you are looking for an opinionated style guide for syntax, conventions, best 
 ## Table of Contents
   1. [Version Control](#version-control)
   1. [Clean code](#clean-code)
-  1. [React](#react)
-  1. [Typescript](#typescript)
+  1. [React+Typescript](#react-plus-typescript)
 
 ## [Version Control](#version-control) [WIP]
 ###### [Rule [G000](#rule-g000)]
@@ -93,6 +92,8 @@ If you are looking for an opinionated style guide for syntax, conventions, best 
 
 ## [Clean code](#clean-code) [Not Started]
 
-## [React](#react) [WIP]
+## [React+TypeScript](#react-plus-typescript) [WIP]
+###### [Rule [RT000](#rule-g000)]
+- Use functional components over class components.
 
-## [Typescript](#typescript) [WIP]
+  *Why?*:
