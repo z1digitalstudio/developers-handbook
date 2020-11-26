@@ -13,8 +13,12 @@ We have been in your situation before and we know that sometimes is not enough o
 **If you are a Z1 developer**  
 We hope that this repo makes your coding easier on a daily basis.
 
+**Do you want to collaborate?**
+Please check this [section](https://github.com/z1digitalstudio/developers-handbook/blob/master/how-to-collaborate.md).
+
 ## Sections
 
+- [How to collaborate](https://github.com/z1digitalstudio/developers-handbook/blob/master/how-to-collaborate.md)
 - [Setup your mac](https://github.com/z1digitalstudio/developers-handbook/blob/master/setup-mac.md)
 - [Setup your IDE](https://github.com/z1digitalstudio/developers-handbook/blob/master/setup-ide.md)
 - [Best practices](https://github.com/z1digitalstudio/developers-handbook/blob/master/best-practices.md)
