@@ -1,18 +1,110 @@
 # Apollo Client
 
-// ToDo Add examples
-
 The aim of this is not to explain how Apollo Client works, but to summarize and discuss some practices we are already using
 in some projects, and to recall some features that can easily go unnoticed under the amount of information we have to deal with daily.
 
-1. Take network options into account. Sometimes, we have data that has to be up to date with a database that is in constant change. However, in many cases we can save a lot of unnecessary requests by calling the data once and reading it from the Apollo Client's cache. For this, it is essential to handle the cache changes each time we modify some of this data.
+###### [Take fetch policy options into account when creating a query hook [01](#point-01)]
 
-2. As a rule of thumb, we create Apollo hooks for handling queries, whether it is a single one or multiple queries which are going to be called at the same time. Consider that these hooks will be called every time a component that calls them renders, so make use of useQuery's skip option in order to call the queries conditionally.
+Sometimes, we have data that has to be up to date with a database that is in constant change. However, in many cases we can save a lot of unnecessary requests by calling the data once and reading it from Apollo client's cache. Remember that if we choose a cache-first fetch policy for our query, it is essential to handle the cache changes each time we modify some of this data via mutations (or refetch the query if we are not able to do so).
 
-3. If the data from a query is going to be used only within a function's scope, we can execute the query call inside that function instead of calling the query hook in that component's useConnect, avoiding unnecessary dependencies on that function's useCallback.
+###### [Make query hooks receive options as a prop [02](#point-02)]
 
-4. As we do with queries, we group mutations affecting the same source or related sources in hooks under the naming use<Source>Actions. After these mutations are executed, it is essential that the app data is updated. If for some reason we are not able to mutate the cache, we can refetch any query we want using useMutation's refetchQueries option.
+We may want our hook to behave differently depending on where it is called. If we foresee that our hook is going to be called on multiple places, it may be a good idea to make it receive options that can be used for overriding useQuery ones.
 
-5. In an ideal world, mutations that create or update data should have the modified entity within the returned data. For creations, we need the created UUID in order to update the cache. For updates, Apollo has a very practical behaviour as it will update the affected entities on the cache automatically. If your mutation return type is something like 'message: String', maybe the backend developer has not taken this into account. It may be a good idea to let them know.
+```typescript
+const useSource = (
+  options: QueryHookOptions<Source> = {},
+) => {
+  const { data, error, fetchMore, loading, refetch } = useQuery<
+    GetSource
+  >(GET_SOURCE, {
+    fetchPolicy: 'cache-and-network',
+    ...options,
+  });
 
-6. Give to Apollo what is Apollo's, and what is the component's to the component. If we are creating hooks for handling Apollo mutations, it is better to return custom handlers that, apart from calling the mutation, perform actions like Apollo's cache updates or side effects that are no related witht he component that calls the mutation on the hook and returning it from there. If we export the mutation directly from our custom hook, we are missing some of the advantages of calling them from a custom hook.
+  // ...
+```
+
+###### [Make use of the skip option [03](#point-03)]
+
+As a rule of thumb, we create Apollo hooks for handling queries, whether it is a single one or multiple queries which are going to be called at the same time. Consider that these hooks will be called every time a component that calls them renders, so make use of useQuery's skip option in order to call the queries conditionally.
+
+###### [Hooks aren't always the only option [04](#point-04)]
+
+3. If the data from a query is going to be used only within a function's scope, we can execute the query call inside that function instead of calling the query hook in that component's useConnect, avoiding unnecessary dependencies on that function's useCallback. Check the following example.
+
+```typescript
+import { getSource } from 'apollo/requests'
+
+const useConnect = () => {
+    ...
+
+    const handleEvent = useCallback(async () => {
+       try {
+        const { data } = await getSource()
+        setSomethingWithSource(data)
+       } catch (e) {
+           // Handle error
+       }
+    }, [])
+
+```
+
+In this case, on some event we are fetching data via getSource (which is making use of apollo client's query method). As we are not passing the data in the dependency array, the callback is not going to be recalculate.
+
+**Note** You may notice we are not passing setSomethinWithSource() in the dependency array either. Remember that, according to React docs:
+
+> React guarantees that setState function identity is stable and won’t change on re-renders. This is why it’s safe to omit from the useEffect or useCallback dependency list.
+
+###### [Give to Apollo what is Apollo's, and what is the component's to the component [05](#point-05)]
+
+As we do with queries, we group mutations affecting the same source or related sources in hooks under the naming use<Source>Actions. Here, we can return custom handlers that, apart from calling the mutation, perform actions like field normalization, Apollo's cache updates, or side effects that are no related with the component that calls the mutation on the hook and returning it from there. If we export the mutation directly from our custom hook, we are missing some of the advantages of calling them from a custom hook.
+
+###### [Keep the client's cache up to date [06](#point-06)]
+
+After mutations are executed, it is essential that cache is updated. If for some reason we are not able to do it, we can refetch any query we want using useMutation's refetchQueries option.
+
+###### [Take advantage of cache auto-updates [07](#point-07)]
+
+In most cases, it is desirable that mutations that create or update data should have the modified entity within the returned data. For creations, we need the created UUID in order to update the cache. For updates, Apollo has a very practical behaviour as it will update the affected entities on the cache automatically. If your mutation return type is something like 'message: String', maybe the backend developer that created it has not taken this into account. It may be a good idea to let them know.
+
+```graphql
+updateSource(
+    updateSourceDto: UpdateSourceInput!
+): Source
+```
+
+###### [Make use of fragments [08](#point-08)]
+
+Fragments will make your live easier when it comes to handle cache updates and keeping queries and mutations cleaner. Having a fragments folder along with your queries, mutations, cache update functions ones may be a great idea. See the following example.
+
+```typescript
+// FRAGMENT
+export const SOURCE_DATA_FRAGMENT = gql`
+  fragment SourceData on Source {
+    id
+    title
+    description
+    updatedAt
+    createdAt
+  }
+`;
+
+export const GET_SOURCE = gql`
+  query GetDeepLink($id: ID!) {
+    deepLink(id: $id) {
+      ...SourceData
+    }
+  }
+  ${SOURCE_DATA_FRAGMENT}
+`;
+
+export const UPDATE_SOURCE = gql`
+  mutation UpdateSource($id: Int!, $data: SourceInput!) {
+    updateSource(id: $id, data: $data) {
+      ...SourceData
+    }
+  }
+  ${SOURCE_DATA_FRAGMENT}
+`;
+```
