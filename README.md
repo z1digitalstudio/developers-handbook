@@ -22,3 +22,4 @@ Please check this [section](https://github.com/z1digitalstudio/developers-handbo
 - [Setup your mac](https://github.com/z1digitalstudio/developers-handbook/blob/master/setup-mac.md)
 - [Setup your IDE](https://github.com/z1digitalstudio/developers-handbook/blob/master/setup-ide.md)
 - [Best practices](https://github.com/z1digitalstudio/developers-handbook/blob/master/best-practices.md)
+- [Apollo client](https://github.com/z1digitalstudio/developers-handbook/blob/master/apollo-client.md)
