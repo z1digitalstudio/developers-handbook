@@ -38,4 +38,9 @@ submitting to this repository.
 
 ###### [Point [09](#point-09)]
 
-- Do not feel forced to write here. It is totally okay if you just come here to read and learn.
+- Do not feel forced to write here. It is totally okay if you just come here to read and learn. Though, as Z1 developer, if you do, you may register the time you dedicate to it as a productive time.
+
+###### [Point [10](#point-10)]
+- Share your contributions as a way to get feedback and encourage others to collaborate. As Z1 developer, you can do so through our Slack dev channels.
+
+
