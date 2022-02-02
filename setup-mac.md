@@ -23,7 +23,9 @@ git --version
 ```
 
 ### NVM
-We use [NVM](https://github.com/nvm-sh/nvm) for being able to manage multiple active node.js versions. Sometimes you could be working in different projects with different Node version requirements.  
+We use [NVM](https://github.com/nvm-sh/nvm) for being able to manage multiple active node.js versions. 
+
+Sometimes you could be working in different projects with different Node version requirements. For that normally you will find a .nvmrc file in the project, and you will be able to set node to the required version by executing `nvm use` command.
 
 [Install instructions](https://github.com/nvm-sh/nvm#install--update-script)  
 [Troubleshooting on Macos](https://github.com/nvm-sh/nvm#troubleshooting-on-macos)  
