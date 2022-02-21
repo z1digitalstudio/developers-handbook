@@ -1,7 +1,6 @@
 # Apollo Client
 
-The aim of this is not to explain how Apollo Client works, but to summarize and discuss some practices we are already using
-in some projects, and to recall some features that can easily go unnoticed under the amount of information we have to deal with daily.
+The aim of this is not to explain how Apollo Client works, but to summarize and discuss some practices we are already using in some projects, and to recall some features that can easily go unnoticed under the amount of information we have to deal with daily.
 
 ###### [Take fetch policy options into account when creating a query hook [01](#point-01)]
 
