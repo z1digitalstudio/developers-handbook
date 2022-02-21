@@ -1,0 +1,115 @@
+# Guide: Start a new project
+
+## Table of Contents
+  0. [Introduction](#introduction)
+  1. [First Steps](#first-steps)
+  3. [Using NextJs](#using-nextjs)
+  4. [Configure ESLint & Prettier](#configure-eslint-prettier)
+  5. [Link a remote repository](#link-remote-repository)
+  6. [Add Styled Components](#add-styled-components)
+  7. [Add Storybook](#add-storybook)
+  8. [Configure Github Actions](#configure-github-actions)
+  9. [Webstorm run configuration](#webstorm-run-configuration)
+  10. [Create theme](#create-theme)
+  11. [Plops](#plops)
+  12. [Configure SVGs and images](#configure-svgs-images)
+  13. [Configure Apollo](#configure-apollo)
+
+---
+⏳ **Next to come**
+- Deploy project
+- Configure routes of Next pages
+- Final steps:
+	- Add README.md
+	- Add metatags
+
+💪 **Want to help to complete this docs?** 
+Feel free to open a PR with changes. Read the rules on  [How to collaborate](https://github.com/z1digitalstudio/developers-handbook/blob/master/how-to-collaborate.md)
+
+---
+## [Introduction](#introduction) 
+
+The aim of this page is to give some guidance when creating a new project. Each project has its own needs and requirements and its configuration, among other things, might be different from other projects. Additionally, the methodology used to create and configure new projects is in continuous change and adaptation to new solutions and recommendations.
+
+However, this might be useful for those who don't even know where to start.
+
+Remember to search for standards and recommendations and reach out to anyone in the Z1 team for support in case you need it 🤝
+
+
+## [First Steps](#first-steps) 
+
+###### [Step [001](#step-new001)] Name project
+Create a local directory that will contain the project files and folders. At Z1, web project are using called in the format [Project Name]-web. (e.g.: renew-web).
+
+###### [Step [002](#step-new002)] Init version control
+Open the terminal and access the recently created directory. Running the following command will convert the existing, un-versioned project to a Git repository. You can find more information [here](https://www.atlassian.com/git/tutorials/setting-up-a-repository/git-init).
+
+   ````bash
+   git init
+   ````
+
+Create a `.gitignore` file for the project. You can use a [generator](https://www.toptal.com/developers/gitignore) and customize it manually. If you are not sure what should be ignored and what shouldn't, don't be scared to ask anyone on the team.
+
+###### [Step [003](#step-new003)] Init package
+ Running the following command helps you create a package.json file through an interactive session. More information [here](https://classic.yarnpkg.com/en/docs/cli/init/).
+
+   ````bash
+   yarn init
+   ````
+   
+If you want to skip this questions, simply use:
+
+```bash
+yarn init -y
+``` 
+
+
+###### [Step [004](#step-new004)] Specity node version
+
+At this point, you might want to modify the `package.json` that has been created. For example, you might want to add the Node version you want to use. You can do it by adding to the `package.json` file the following code:
+
+````json
+	"engines": {
+		"node": ">= 14.17.4"
+	  }
+````
+
+You should [check for the LTS version of Node](https://nodejs.org/es/), and specify that one. 
+
+We can also create a `.nvmrc` file and write the version we want to use inside it. This will allow developers to run `nvm use` to use the project's recommended Node version. 
+
+You can create this file manually of by running the following command:
+
+````
+node -v > .nvmrc
+````
+
+Be aware that this command will generate the file with your installed node version, which may not match the one you specified before on `package.json`.
+
+###### [Step [005](#step-new005)] Upgrade to Yarn2 (optional)
+Optionally, you could upgrade Yarn version to [Yarn 2](https://yarnpkg.com/getting-started/install) with the following command:
+
+````
+yarn set version berry
+````
+
+At the time we wrote this, we added the following line to the  `.yarnrc.yml`  file to use node modules instead of pnp as the last one is yet not supported by some packages. More info can be found in the [Yarn Configuration Options Docs](https://yarnpkg.com/configuration/yarnrc#nodeLinker).
+
+````
+nodeLinker: node-modules
+````
+
+If we are using Yarn 2, you should change the `gitignore` file sections related to Yarn 2 to add the lines of code recommended in its [documentation](https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored). In our case we were using zero-installs configuration. The code we added was:
+
+````
+# yarn v2 
+	.yarn/ 
+	.yarn/* 
+	!.yarn/cache 
+	!.yarn/patches 
+	!.yarn/plugins 
+	!.yarn/releases 
+	!.yarn/sdks 
+	!.yarn/versions
+````
+
