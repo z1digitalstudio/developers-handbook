@@ -82,6 +82,6 @@ If we are using Yarn 2, you should change the `gitignore` file sections related 
 
 
 ---
-⬅️ Prev [Start here](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/00-start-here)
+⬅️ Prev [Start here](./00-start-here)
 
-➡️ Next [Using NextJs](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/02-using-nextjs)
+➡️ Next [Using NextJs](./02-using-nextjs)

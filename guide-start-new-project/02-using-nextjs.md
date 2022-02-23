@@ -101,6 +101,6 @@ module.exports = {
 Now, you can run yarn start 🚀
 
 ---
-⬅️ Prev [First Steps](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/01-first-steps)
+⬅️ Prev [First Steps](./01-first-steps)
 
-➡️ Next  [Configure ESLint & Prettier](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/03-eslint-prettier)
+➡️ Next  [Configure ESLint & Prettier](./03-eslint-prettier)

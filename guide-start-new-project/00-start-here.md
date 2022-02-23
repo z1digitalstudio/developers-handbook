@@ -2,10 +2,10 @@
 
 ## Table of Contents
   0. [Introduction](#introduction)
-  1. [First Steps](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/01-first-steps)
-  3. [Using NextJs](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/02-using-nextjs)
-  4. [Configure ESLint & Prettier](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/03-eslint-prettier)
-  5. [Link a remote repository](#link-remote-repository)
+  1. [First Steps](./01-first-steps)
+  3. [Using NextJs](./02-using-nextjs)
+  4. [Configure ESLint & Prettier](./03-eslint-prettier)
+  5. [Link a remote repository](./04-link-remote-repository)
   6. [Add Styled Components](#add-styled-components)
   7. [Add Storybook](#add-storybook)
   8. [Configure Github Actions](#configure-github-actions)
@@ -24,7 +24,7 @@
 	- Add metatags
 
 💪 **Want to help to complete this docs?** 
-Feel free to open a PR with changes. Read the rules on  [How to collaborate](https://github.com/z1digitalstudio/developers-handbook/blob/master/how-to-collaborate.md)
+Feel free to open a PR with changes. Read the rules on [How to collaborate](../how-to-collaborate.md)
 
 ---
 ## [Introduction](#introduction) 
@@ -37,5 +37,5 @@ Remember to search for standards and recommendations and reach out to anyone in 
 
 
 ---
-➡️ Next [First Steps](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/01-first-steps)
+➡️ Next [First Steps](./01-first-steps)
 
