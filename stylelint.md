@@ -36,6 +36,7 @@ module.exports = {
     /* Styled components conditional blocks are not supported in css in js stylelint's implementation, and it throws false positives */
     'no-duplicate-selectors': null,
     'no-empty-source': null,
+    'no-descending-specificity': null,
   },
 };
 ```
