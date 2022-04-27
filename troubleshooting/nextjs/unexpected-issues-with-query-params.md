@@ -4,10 +4,10 @@ Sometimes we need to get data from our `query parameters` allocated in our `url`
 
 ## `Nextjs` query params under the hood.
 
-The first thing to know, is that `next.js` **always compiles/transform** some of your pages into a file `html`. In that process it picks the default states to create it. 
-After that, that `html`, when requested, is sent to the client/user, where the next step named by them as **hydration** happens. In this moment, `javascript` takes place and `react.js` starts to bring **interactivity** to our page. That's instant where things start to be **reactive**.
+The first thing to know, is that `next.js` **always compiles/transform** some of your pages into a file `html`. In that process it picks the default states to create them. 
+After that, that `html`, when requested, is sent to the client/user, where the next step named by them as **hydration** happens. In this moment, `javascript` takes place and `react.js` starts to bring **interactivity** to our page. That instant is where things start to be **reactive**.
 
-During this hydration stage, previously commented, you should know that `query` needs to be read, and that process take some time; in other words, **`query` is `{}` (an empty object), and your query properties `undefined` (ex: `query.page`) up to hydration fully happens and triggers that functionality**.
+During this hydration stage, previously commented, you should know that `query` needs to be read, and that process takes some time; in other words, **`query` is `{}` (an empty object), and your query properties `undefined` (ex: `query.page`) up to hydration fully happens and triggers that functionality**.
 
 In short, this is what happens with query params along these steps:
 1. `next.js` server send to the client a raw html with no functionality. In this step `js` is not present, so your codes doesn't run either.
@@ -35,7 +35,7 @@ Let's suppose the next use case:
 
 > We want to set our selected job offer card in our query params so that it can be easily shared among users in social media, however, if that query param is not present, we would like to automatically select the first card in the list.
 
-> When we click in a card, a detailed preview of that job offer appears next to the list.
+> When we click in a card, a detailed preview of that job offer renders next to the list.
 
 The query param key is `"jobOfferId"`.
 
