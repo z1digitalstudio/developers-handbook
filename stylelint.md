@@ -3,7 +3,7 @@
 1. First of all, we need to install a bunch of dependencies:
 
 ```sh
-yarn install stylelint stylelint-a11y stylelint-config-rational-order stylelint-config-recommended stylelint-config-standard stylelint-config-styled-components stylelint-order stylelint-use-logical @stylelint/postcss-css-in-js postcss postcss-scss postcss-syntax
+yarn add stylelint stylelint-a11y stylelint-config-rational-order stylelint-config-recommended stylelint-config-standard stylelint-config-styled-components stylelint-order stylelint-use-logical @stylelint/postcss-css-in-js postcss postcss-scss postcss-syntax
 ```
 
 2. We need to create a `stylelintrc.js` and config our rules:
