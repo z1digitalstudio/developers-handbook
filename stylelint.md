@@ -50,7 +50,7 @@ module.exports = {
 };
 ```
 
-3. We need to install [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint) Extension for VSC and add a custom configuration in `.vscode/settings.json`:
+3. We need to install [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint) extension for Visual Studio Code and add a custom configuration in `.vscode/settings.json`. You can find it at _Code > Preferences > Settings > Extensions > Stylelint > Edit in settings.json_:
 
 ```json
 {
@@ -130,4 +130,45 @@ if (
 module.exports = config;
 ```
 
-7. And that's all 🚀
+7. Add a project settings directory. Create a `.vscode` folder and place this two files inside with the following code:
+
+- `extensions.json`
+
+```
+{
+  "recommendations": [
+    "stylelint.vscode-stylelint",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint"
+  ]
+}
+```
+
+- `settings.json`
+
+```
+{
+  "css.validate": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.suggestSelection": "first",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+  "eslint.format.enable": true,
+  "less.validate": false,
+  "scss.validate": false,
+  "stylelint.enable": true,
+  "stylelint.packageManager": "yarn",
+  "stylelint.validate": [
+    "css",
+    "postcss",
+    "scss",
+    "typescript",
+    "typescriptreact"
+  ]
+}
+```
+
+8. And that's all 🚀
