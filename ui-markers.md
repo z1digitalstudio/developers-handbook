@@ -7,10 +7,14 @@
 
 ## Posts to read
 
+- [Accessible Icon Buttons](https://www.sarasoueidan.com/blog/accessible-icon-buttons/) 2022 - Sara Soueidan
+- [The Surprising Truth About Pixels and Accessibility: should I use pixels or rems?](https://www.joshwcomeau.com/css/surprising-truth-about-pixels-and-accessibility/) 2022 - Josh W Comeau
 - [Div divisiveness](https://www.scottohara.me/blog/2022/01/20/divisive.html) 2022 - Scott O'Hara
+- [How-to: Accessible heading structure](https://www.a11yproject.com/posts/how-to-accessible-heading-structure/) 2022 - The A11Y Project
 - [Defensive CSS](https://ishadeed.com/article/defensive-css/) 2021 - Ahmad Shadeed
 - [A guide to designing accessible, WCAG-compliant focus indicators.](https://www.sarasoueidan.com/blog/focus-indicators/) 2021 - Sara Soueidan
 - [One of my favourite accessibility testing tools: The Tab Key.](https://www.matuzo.at/blog/testing-with-tab/) 2020 - Manuel Matuzović
+- [Contextually Marking up accessible images and SVGs](https://www.scottohara.me/blog/2019/05/22/contextual-images-svgs-and-a11y.html) 2019 - Scott O'Hara
 
 ## Blogs to follow
 
@@ -30,6 +34,7 @@
 - [Manuel Matuzovic](https://www.matuzo.at/)
 - [HTMHell - Manuel Matuzović](https://www.htmhell.dev/)
 - [Ahmad Shadeed](https://ishadeed.com/)
+- [Josh W Comeau](https://www.joshwcomeau.com/)
 - [Web Axe](http://www.webaxe.org/)
 - [The A11Y Project](https://www.a11yproject.com/)
 - [Smashing Magazine](https://www.smashingmagazine.com/)
