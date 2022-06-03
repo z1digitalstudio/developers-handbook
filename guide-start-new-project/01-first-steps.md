@@ -1,6 +1,4 @@
-
-[**📖 Guide: Start a new project**](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/00-start-here)
-
+[**📖 Guide: Start a new project**](./00-start-here.md)
 
 ## [First Steps](#first-steps) 
 
@@ -8,11 +6,13 @@
 Create a local directory that will contain the project files and folders. At Z1, web project are using called in the format [Project Name]-web. (e.g.: renew-web).
 
 ###### [Step [002](#step-new002)] Init version control
-Open the terminal and access the recently created directory. Running the following command will convert the existing, un-versioned project to a Git repository. You can find more information [here](https://www.atlassian.com/git/tutorials/setting-up-a-repository/git-init).
+Open the terminal to access the project directory. Running the following command will convert the existing, un-versioned folder into a Git repository. 
 
    ````bash
    git init
    ````
+
+You can find more information [here](https://www.atlassian.com/git/tutorials/setting-up-a-repository/git-init).
 
 Create a `.gitignore` file for the project. You can use a [generator](https://www.toptal.com/developers/gitignore) and customize it manually. If you are not sure what should be ignored and what shouldn't, don't be scared to ask anyone on the team.
 
@@ -42,7 +42,7 @@ At this point, you might want to modify the `package.json` that has been created
 
 You should [check for the LTS version of Node](https://nodejs.org/es/), and specify that one. 
 
-We can also create a `.nvmrc` file and write the version we want to use inside it. This will allow developers to run `nvm use` to use the project's recommended Node version. 
+You can also **create a `.nvmrc` file**  and write the node version to use inside it. This will allow developers to run `nvm use` to use the project's recommended Node version. 
 
 You can create this file manually of by running the following command:
 
@@ -82,6 +82,6 @@ If we are using Yarn 2, you should change the `gitignore` file sections related 
 
 
 ---
-⬅️ Prev [Start here](./00-start-here)
+⬅️ Prev [Start here](./00-start-here.md)
 
-➡️ Next [Using NextJs](./02-using-nextjs)
+➡️ Next [Using NextJs](./02-using-nextjs.md)

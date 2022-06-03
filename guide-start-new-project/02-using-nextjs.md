@@ -1,6 +1,4 @@
-
-[**📖 Guide: Start a new project**](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/00-start-here)
-
+[**📖 Guide: Start a new project**](./00-start-here.md)
 
 ## [Using NextJs](#using-nextjs) 
 
@@ -101,6 +99,6 @@ module.exports = {
 Now, you can run yarn start 🚀
 
 ---
-⬅️ Prev [First Steps](./01-first-steps)
+⬅️ Prev [First Steps](./01-first-steps.md)
 
-➡️ Next  [Configure ESLint & Prettier](./03-eslint-prettier)
+➡️ Next  [Configure ESLint & Prettier](./03-eslint-prettier.md)

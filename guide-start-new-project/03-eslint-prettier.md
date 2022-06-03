@@ -1,10 +1,8 @@
-
-[**📖 Guide: Start a new project**](https://github.com/z1digitalstudio/developers-handbook/blob/master/guide-start-new-project/00-start-here)
-
+[**📖 Guide: Start a new project**](./00-start-here.md)
 
 ## [Configure ESLint & Prettier](#configure-eslint-prettier) 
 
-This document is focused on configuring **static analysis tools** for our project.
+This chapter is focused on configuring **static analysis tools** for our project.
 
 > ⚡️ Static code analysis is the process of verifying that your code meets certain expectations without actually running it. It allows developers to improve the codebase's readability and consistency while finding possible bugs and anti-patterns. Static analysis tools help us to validate the modern development standards. It can ensure all the team is writing high-quality code consistently across the board.
 
@@ -419,11 +417,11 @@ Then run yarn. Once it is done, you should be able to use this absolute paths.
 	...
 ```
 
-
--- Revisar mi guia
-GraphQL intellisense
+---
+**TODO**:
+- [ ] GraphQL intellisense
 
 ---
-⬅️ Prev [Using NextJs](./02-using-nextjs)
+⬅️ Prev [Using NextJs](./02-using-nextjs.md)
 
-➡️ Next [Link a remote repository](./04-link-remote-repository)
+➡️ Next [Link a remote repository](./04-link-remote-repository.md)
