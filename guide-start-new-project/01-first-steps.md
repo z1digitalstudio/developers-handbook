@@ -2,10 +2,10 @@
 
 ## [First Steps](#first-steps) 
 
-###### [Step [001](#step-new001)] Name project
+#### [Step [001](#step-new001)] Name project
 Create a local directory that will contain the project files and folders. At Z1, web project are using called in the format [Project Name]-web. (e.g.: renew-web).
 
-###### [Step [002](#step-new002)] Init version control
+#### [Step [002](#step-new002)] Init version control
 Open the terminal to access the project directory. Running the following command will convert the existing, un-versioned folder into a Git repository. 
 
    ````bash
@@ -30,7 +30,7 @@ yarn init -y
 ``` 
 
 
-###### [Step [004](#step-new004)] Specity node version
+#### [Step [004](#step-new004)] Specity node version
 
 At this point, you might want to modify the `package.json` that has been created. For example, you might want to add the Node version you want to use. You can do it by adding to the `package.json` file the following code:
 
@@ -52,7 +52,7 @@ node -v > .nvmrc
 
 Be aware that this command will generate the file with your installed node version, which may not match the one you specified before on `package.json`.
 
-###### [Step [005](#step-new005)] Upgrade to Yarn2 (optional)
+#### [Step [005](#step-new005)] Upgrade to Yarn2 (optional)
 Optionally, you could upgrade Yarn version to [Yarn 2](https://yarnpkg.com/getting-started/install) with the following command:
 
 ````
