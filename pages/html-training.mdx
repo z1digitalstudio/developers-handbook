@@ -1,8 +1,8 @@
 # HTML Training
 
-The next HTML snippets are examples of an accessible and SEO friendly semantic code, there are other ways to achieve the same results. These are based on the of the [WHATWG Living Standard](https://html.spec.whatwg.org/), best practices conventions and our dev experience dealing with UI hacks.
+The next HTML snippets are examples of an accessible and SEO friendly semantic code, there are other ways to achieve the same results. These are based on the of the best practices conventions and our dev experience dealing with UI hacks.
 
-This HTML guide is intended to be a quick reference on your development journey, for a deeper understanding we highly recommend [MDN Web Docs](https://developer.mozilla.org/).
+This HTML guide is intended to be a quick reference on your development journey, for a deeper understanding we highly recommend [MDN Web Docs](https://developer.mozilla.org/) and the blogs listed in [UI Markers](/ui-markers).
 
 So you know at Z1 we encourage designers and developers to use native elements as they're meant to be. The Web is accessible by default, let's not break it!
 
@@ -28,13 +28,27 @@ So you know at Z1 we encourage designers and developers to use native elements a
 
 ## Links
 
-**Internal link**
+**Internal links**
+
+<br />
+<a href="/about/">About us</a>
 
 ```html
 <a href="/about/">About us</a>
 ```
 
+```html
+<a href="/about/" aria-current="page">About us</a>
+```
+
+```html
+<a href="/about/" onclick="analyticsEvent()">About us</a>
+```
+
 **Anchor links**
+
+<br />
+<a href="#section-name">Section name</a>
 
 ```html
 <a href="#section-name">Section name</a>
@@ -44,35 +58,41 @@ So you know at Z1 we encourage designers and developers to use native elements a
 <a href="#main-content" class="visually-hidden">Skip navigation</a>
 ```
 
-**External links**
+**External links**. There is a debate about whether external links should be opened in a new tab. We are used to the fact that internal links open in the same tab and external links open in a new tab, which in terms of accessibility is an issue. So may is better to give the user the option to choose, this will probably end up being the normal behavior of the Web, indeed browsers already provide that option.
+
+Another concern with external links is that the use of `target="_blank"` exposes to more vulnerabilities and for security reasons we must add to the `rel` attribute the values `noopener` and `noreferrer`, although most browsers have already implemented security measures.
+
+<br />
+<a href="https://some-blog.com" rel="noopener noreferrer" target="_blank">
+  Some blog
+</a>
 
 ```html
-<a href="https://blog.my-domain.com" rel="noopener noreferrer" target="_blank">
-  Our blog
+<a href="https://some-blog.com" rel="noopener noreferrer" target="_blank">
+  Some blog
 </a>
 ```
 
 ```html
-<a
-  href="https://marketing-partner.com"
-  rel="noopener noreferrer"
-  target="_blank"
->
+<a href="https://some-blog.com">Some blog</a>
+```
+
+```html
+<a href="https://marketing-partner.com" onclick="analyticsEvent()">
   Marketing partner
 </a>
 ```
 
 ```html
-<a
-  href="https://github.com/"
-  rel="noopener noreferrer nofollow"
-  target="_blank"
->
-  GitHub
-</a>
+<a href="https://github.com/" rel="nofollow">GitHub</a>
 ```
 
 **Download link**
+
+<br />
+<a href="./doc.pdf" download="file-name.pdf">
+  Download doc
+</a>
 
 ```html
 <a href="./doc.pdf" download="file-name.pdf">Download doc</a>
@@ -99,28 +119,35 @@ So you know at Z1 we encourage designers and developers to use native elements a
 
 ```html
 <a href="#main-content" title="Back to top">
-  <svg aria-hidden="true" focusable="none" width="100" height="100">
-</svg>
+  <svg aria-hidden="true" focusable="none" width="100" height="100"></svg>
 </a>
 ```
 
 **Descriptive links**. The text should provide information about the link, if not we can add a `title` as description.
 
-```html
+<br />
 <a href="#main-content" title="New features available">
   Learn more
 </a>
+
+```html
+<a href="#main-content" title="New features available">Learn more</a>
 ```
 
 ## Button
 
-Button
+**Button**.
+
+<br />
+<button type="button" onclick="editItem()">
+  Edit item
+</button>
 
 ```html
 <button type="button" onclick="editItem()">Edit item</button>
 ```
 
-Button with icon
+**Button with icon**.
 
 ```html
 <button type="button" onclick="addItem()">
@@ -129,7 +156,7 @@ Button with icon
 </button>
 ```
 
-Icon button
+**Icon button**.
 
 ```html
 <button type="button" onclick="removeItem()" aria-label="Remove item">
@@ -139,12 +166,282 @@ Icon button
 
 ## Lists
 
+**Unordered list**.
+
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>Item</li>
+</ul>
+
+```html
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>Item</li>
+</ul>
+```
+
+**Ordered list**.
+
+<ol>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ol>
+
+```html
+<ol>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ol>
+```
+
+**Reversed ordered list**.
+
+<ol reversed>
+  <li>C</li>
+  <li>B</li>
+  <li>A</li>
+</ol>
+
+```html
+<ol reversed>
+  <li>C</li>
+  <li>B</li>
+  <li>A</li>
+</ol>
+```
+
+**List without bullets**. If you use `list-style: none` to remove the bullets of a list the element will be considered no longer a list, so you need to add `role="list"` to recover its meaning. Be aware that in some cases like this CSS styles may affect the semantic and accessibility of HTML elements.
+
+export const ListWithoutBullets = () => {
+  const listStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+  };
+  const rowlistStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+    display: "flex",
+    gap: "12px",
+  };
+  return (
+    <>
+      <ul>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+      </ul>
+      <ul role="list" style={rowlistStyle}>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+      </ul>
+    </>
+  );
+};
+
+<ListWithoutBullets />
+
+```html
+<ul role="list">
+  <li>Item</li>
+  <li>Item</li>
+  <li>Item</li>
+</ul>
+```
+
+**Nested lists**. We can nest a list inside another and we can have multiple lists nested. The correct markup will be always do it inside a `li`, because only `li` can be direct child of `ul` and `ol`. For example we shouldn't use `div` to group the list items, that would break the semantic structure.
+
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>
+    <p>Item list</p>
+    <ul>
+      <li>Item</li>
+      <li>Item</li>
+      <li>
+        <p>Item list</p>
+        <ol>
+          <li>Item</li>
+          <li>Item</li>
+          <li>Item</li>
+        </ol>
+      </li>
+      <li>Item</li>
+    </ul>
+  </li>
+  <li>Item</li>
+</ul>
+
+```html
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>
+    <p>Item list</p>
+    <ul>
+      <li>Item</li>
+      <li>Item</li>
+      <li>
+        <p>Item list</p>
+        <ol>
+          <li>Item</li>
+          <li>Item</li>
+          <li>Item</li>
+        </ol>
+      </li>
+      <li>Item</li>
+    </ul>
+  </li>
+  <li>Item</li>
+</ul>
+```
+
+**Cards list**. The li element can contain any HTML element so we can use ul for many common UI patterns, like a list of features with title and text, could use `ul` even if they look like cards, semantically it is a list.
+
+export const CardsList = () => {
+  const listStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+    display: "flex",
+    gap: "24px",
+  };
+  const cardStyle = {
+    border: "1px solid",
+    borderRadius: "8px",
+    paddingBlock: " 0 24px",
+    paddingInline: "24px 32px",
+  };
+  return (
+    <>
+      <ul>
+        <li>
+          <h3>Feature</h3>
+          <p>Description</p>
+        </li>
+        <li>
+          <h3>Feature</h3>
+          <p>Description</p>
+        </li>
+        <li>
+          <h3>Feature</h3>
+          <p>Description</p>
+        </li>
+      </ul>
+      <ul role="list" style={listStyle}>
+        <li style={cardStyle}>
+          <h3>Feature</h3>
+          <p>Description</p>
+        </li>
+        <li style={cardStyle}>
+          <h3>Feature</h3>
+          <p>Description</p>
+        </li>
+        <li style={cardStyle}>
+          <h3>Feature</h3>
+          <p>Description</p>
+        </li>
+      </ul>
+    </>
+  );
+};
+
+<CardsList />
+
+```html
+<ul>
+  <li>
+    <h3>Feature</h3>
+    <p>Description</p>
+  </li>
+  <li>
+    <h3>Feature</h3>
+    <p>Description</p>
+  </li>
+  <li>
+    <h3>Feature</h3>
+    <p>Description</p>
+  </li>
+</ul>
+```
+
+**Steps list**. Same for steps of any kind, some have numbers others have arrows, we can use `ol` because however they look like regarding to semantics they are ordered lists. If the arrows go in the other direction use the `reversed` atribute for this markup to have the same meaning as it does visually.
+
+export const StepsList = () => {
+  const listStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+    display: "flex",
+    gap: "24px",
+  };
+  const cardStyle = {
+    border: "1px solid",
+    borderRadius: "8px",
+    paddingBlock: " 0 24px",
+    paddingInline: "24px 32px",
+  };
+  return (
+    <>
+      <ol>
+        <li>
+          <h3>Step</h3>
+          <p>Instructions</p>
+        </li>
+        <li>
+          <h3>Step</h3>
+          <p>Instructions</p>
+        </li>
+        <li>
+          <h3>Step</h3>
+          <p>Instructions</p>
+        </li>
+      </ol>
+      <ol role="list" style={listStyle}>
+        <li style={cardStyle}>
+          <h3>Step →</h3>
+          <p>Instructions</p>
+        </li>
+        <li style={cardStyle}>
+          <h3>Step →</h3>
+          <p>Instructions</p>
+        </li>
+        <li style={cardStyle}>
+          <h3>Step</h3>
+          <p>Instructions</p>
+        </li>
+      </ol>
+    </>
+  );
+};
+
+<StepsList />
+
+```html
+<ol role="list">
+  <li>
+    <h3>Step</h3>
+    <p>Instructions</p>
+  </li>
+  <li>
+    <h3>Step</h3>
+    <p>Instructions</p>
+  </li>
+  <li>
+    <h3>Step</h3>
+    <p>Instructions</p>
+  </li>
+</ol>
+```
+
 ## Landmarks
 
 Use the appropriate landmarks to identify the different regions of content on a web page. The most important landmark roles are `main` and `navigation`, as nearly every page will include at least those regions.
 
 Use HTML5 sectioning elements that have a default ARIA landmark role: `main (main)`, `nav (navigation)`, `aside (complementary)` and in some situations `header (banner)` and `footer (contentinfo)`. Do not nest landmarks with the same role.
-
 
 ### Banner
 
@@ -201,111 +498,6 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
   <h2>Section title</h2>
 </section>
 ```
-
-## Navigation
-
-### Header
-
-```html
-<header>
-  <div class="wrapper">
-    <nav>
-      <a href="/" title="Home">
-        <svg aria-hidden="true" focusable="none"></svg>
-      </a>
-      <a href="#main-content" class="visually-hidden">Skip navigation</a>
-      <ul>
-        <li>
-          <p><a href="/page/">Page</a></p>
-          <ul>
-            <li><a href="/page/one/">One</a></li>
-            <li><a href="/page/two/">Two</a></li>
-            <li><a href="/page/three/">Three</a></li>
-            <li>
-              <a href="/page/four/">Second level page</a>
-              <ul>
-                <li><a href="/page/four/a">A</a></li>
-                <li><a href="/page/four/b">B</a></li>
-                <li><a href="/page/four/c">C</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li><a href="/about/">About us</a></li>
-        <li><a href="/blog/">Blog</a></li>
-      </ul>
-      <button type="button" onclick="openModal()">Log in</button>
-    </nav>
-  </div>
-</header>
-```
-
-### Breadcrumb
-
-```html
-<nav aria-label="Breadcrumb">
-  <p>
-    <a href="/blog/">Blog</a>
-    >
-    <a href="/blog/post-title/" aria-current="page">Post title</a>
-  </p>
-</nav>
-```
-
-### Footer
-
-```html
-<footer>
-  <div class="wrapper">
-    <p>Copyleft HTML Training</p>
-    <nav aria-label="Legal">
-      <p>
-        <a href="/terms/">Terms of Service</a>
-        —
-        <a href="/privacy-policy/">Privacy Policy</a>
-        —
-        <a href="/cookies/">Cookies</a>
-      </p>
-    </nav>
-    <nav aria-label="Social">
-      <ul>
-        <li>
-          <a
-            href="https://joinmastodon.org/"
-            rel="noopener noreferrer nofollow"
-            target="_blank"
-            title="Mastodon"
-          >
-            <svg aria-hidden="true" focusable="none"></svg>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://pixelfed.social/"
-            rel="noopener noreferrer nofollow"
-            target="_blank"
-            title="Pixelfed"
-          >
-            <svg aria-hidden="true" focusable="none"></svg>
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://joinpeertube.org/"
-            rel="noopener noreferrer nofollow"
-            target="_blank"
-            title="PeerTube"
-          >
-            <svg aria-hidden="true" focusable="none"></svg>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </div>
-</footer>
-```
-
-## Cards
 
 ## Layout
 
@@ -407,3 +599,150 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 </aside>
 <footer>Footer</footer>
 ```
+
+## Components
+
+### Header
+
+```html
+<header>
+  <div class="wrapper">
+    <nav>
+      <a href="/" title="Home">
+        <svg aria-hidden="true" focusable="none"></svg>
+      </a>
+      <a href="#main-content" class="visually-hidden">Skip navigation</a>
+      <ul>
+        <li>
+          <p><a href="/page/">Page</a></p>
+          <ul>
+            <li><a href="/page/one/">One</a></li>
+            <li><a href="/page/two/">Two</a></li>
+            <li><a href="/page/three/">Three</a></li>
+            <li>
+              <a href="/page/four/">Second level page</a>
+              <ul>
+                <li><a href="/page/four/a">A</a></li>
+                <li><a href="/page/four/b">B</a></li>
+                <li><a href="/page/four/c">C</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="/about/">About us</a></li>
+        <li><a href="/blog/">Blog</a></li>
+      </ul>
+      <button type="button" onclick="openModal()">Log in</button>
+    </nav>
+  </div>
+</header>
+```
+
+### Footer
+
+```html
+<footer>
+  <div class="wrapper">
+    <p>Copyleft HTML Training</p>
+    <nav aria-label="Legal">
+      <p>
+        <a href="/terms/">Terms of Service</a>
+        —
+        <a href="/privacy-policy/">Privacy Policy</a>
+        —
+        <a href="/cookies/">Cookies</a>
+      </p>
+    </nav>
+    <nav aria-label="Social">
+      <ul>
+        <li>
+          <a
+            href="https://joinmastodon.org/"
+            rel="noopener noreferrer nofollow"
+            target="_blank"
+            title="Mastodon"
+          >
+            <svg aria-hidden="true" focusable="none"></svg>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://pixelfed.social/"
+            rel="noopener noreferrer nofollow"
+            target="_blank"
+            title="Pixelfed"
+          >
+            <svg aria-hidden="true" focusable="none"></svg>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://joinpeertube.org/"
+            rel="noopener noreferrer nofollow"
+            target="_blank"
+            title="PeerTube"
+          >
+            <svg aria-hidden="true" focusable="none"></svg>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+```
+
+### Breadcrumb
+
+<nav aria-label="Breadcrumb">
+  <p>
+    <a href="/blog/">Blog</a>
+    <a href="/blog/post-title/" aria-current="page">
+      Post title
+    </a>
+  </p>
+</nav>
+
+```html
+<nav aria-label="Breadcrumb">
+  <p>
+    <a href="/blog/">Blog</a>
+    >
+    <a href="/blog/post-title/" aria-current="page">Post title</a>
+  </p>
+</nav>
+```
+
+### Accordion
+
+<br />
+<details>
+  <summary>Details summary</summary>
+  <p>More info about the details.</p>
+</details>
+
+```html
+<details>
+  <summary>Details summary</summary>
+  <p>More info about the details.</p>
+</details>
+```
+
+### Dropdown
+
+## Cards
+
+## Tables
+
+## Picture
+
+## Audio
+
+## Video
+
+## Forms
+
+### Input
+
+### Progress
+
+### Output
