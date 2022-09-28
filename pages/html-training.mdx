@@ -447,39 +447,69 @@ Use the appropriate landmarks to identify the different regions of content on a 
 
 Use HTML5 sectioning elements that have a default ARIA landmark role: `main (main)`, `nav (navigation)`, `aside (complementary)` and in some situations `header (banner)` and `footer (contentinfo)`. Do not nest landmarks with the same role.
 
-### Banner
+**Banner**. The element `header` has banner role by default, is commonly use for the top navbar that contain the main navigation and is the same on all pages.
+
+Could be a sidebar as well, that's common in web applications, appearance is not as important as semantics in identifying whether it is a header. The main `header` should be only one and cannot be nested inside another, but we can use it as a header of an `article`.
 
 ```html
-<header>Header</header>
+<header>Site header</header>
+<main>
+  <article>
+    <header>Article header</header>
+  </article>
+</main>
 ```
 
-### Navigation
-
-```html
-<nav>Navigation</nav>
-```
-
-### Main
+**Main**. The `main` landmark contain the most important and unique content of each page. Should be only one and cannot be nested inside another.
 
 ```html
 <main>Main</main>
 ```
 
-### Complementary
+**Complementary**. The `aside` with complementary role is, as its name indicates, additional to the main content, it contains elements related to the main content but it is something extra, not so important.
+
+Can be use next to the `main` or inside an `article`. A few examples or `aside` can be related posts, shared links, banners, advertising, etc. Again appearance is not decisive, there may be multiple asides.
 
 ```html
-<aside>Aside</aside>
+<main>
+  <article>
+    <aside>Share links</aside>
+  </article>
+</main>
+<aside>Related posts</aside>
 ```
 
-### Contentinfo
+**Contentinfo**. The `footer` contain information about the site or related as navigation, contact, social links.
+The main `footer` should be only one and cannot be nested inside another, so like `header` and `aside` could be use inside `article`.
 
 ```html
+<main>
+  <article>
+    <footer>Author info</footer>
+  </article>
+</main>
 <footer>Footer</footer>
 ```
 
-### Region
+**Navigation**. The `nav` tag should be use when a container has links to pages or links related to the website. The main navigation appears in the `header`, some others can be use across the pages in the `main` content, like breadcrumb or tabs and listed in the `footer`.
 
-An alternative landmark can be created using the `section` element, which has a default landmark role of region, with an accessible name using `aria-labelledby` to reference a heading element
+The secodary navigations will need an `aria-label`, it's not necessary to include descriptive words like menu, navigation or links as the semantic tags will annouce by itself. Shouldn't be nested inside another.
+
+```html
+<header>
+  <nav>Main navigation</nav>
+</header>
+<main>
+  <nav aria-label="Breadcrumb">Secondary navigation</nav>
+  <nav aria-label="Categories">Secondary navigation</nav>
+</main>
+<footer>
+  <nav aria-label="Legal">Secondary navigation</nav>
+  <nav aria-label="Social">Secondary navigation</nav>
+</footer>
+```
+
+**Region**. An alternative landmark can be created using the `section` element, which has a default landmark role of region, with an accessible name using `aria-labelledby` to reference a heading element
 
 ```html
 <section aria-labelledby="this-section">
@@ -487,9 +517,9 @@ An alternative landmark can be created using the `section` element, which has a 
 </section>
 ```
 
-Too many landmark roles create "noise" in screen readers, making it difficult to understand the overall layout of the page.
+Keep in mind that too many landmark roles create "noise" in screen readers, making it difficult to understand the overall layout of the page.
 
-So if the section it's not going to be a landmark, what if we use `div` instead, is that wrong? not at all, it would be the same, just that with `section` the code look nicer :)
+So if the section it's not going to be a landmark, what if we use `div` instead, is that wrong? not at all, it would be the same, just that `section` is semantic so the code look nicer :)
 
 ```html
 <div>
