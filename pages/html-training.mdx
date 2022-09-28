@@ -308,11 +308,13 @@ export const CardsList = () => {
     listStyle: "none",
     marginInlineStart: "0",
     display: "flex",
+    flexWrap: "wrap",
     gap: "24px",
   };
   const cardStyle = {
     border: "1px solid",
     borderRadius: "8px",
+    minWidth: "160px",
     paddingBlock: " 0 24px",
     paddingInline: "24px 32px",
   };
@@ -353,7 +355,7 @@ export const CardsList = () => {
 <CardsList />
 
 ```html
-<ul>
+<ul role="list">
   <li>
     <h3>Feature</h3>
     <p>Description</p>
@@ -376,11 +378,13 @@ export const StepsList = () => {
     listStyle: "none",
     marginInlineStart: "0",
     display: "flex",
+    flexWrap: "wrap",
     gap: "24px",
   };
   const cardStyle = {
     border: "1px solid",
     borderRadius: "8px",
+    minWidth: "160px",
     paddingBlock: " 0 24px",
     paddingInline: "24px 32px",
   };
@@ -693,12 +697,13 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 
 ### Breadcrumb
 
+<br />
 <nav aria-label="Breadcrumb">
   <p>
-    <a href="/blog/">Blog</a>
-    <a href="/blog/post-title/" aria-current="page">
-      Post title
-    </a>
+    <p>
+      <a href="/blog/">Blog</a> > <a href="/blog/category">Category</a> >
+      <span>Current post</span>
+    </p>
   </p>
 </nav>
 
@@ -707,7 +712,9 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
   <p>
     <a href="/blog/">Blog</a>
     >
-    <a href="/blog/post-title/" aria-current="page">Post title</a>
+    <a href="/blog/category">Category</a>
+    >
+    <span>Current post</span>
   </p>
 </nav>
 ```
