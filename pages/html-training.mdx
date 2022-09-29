@@ -60,6 +60,8 @@ To add interactive actions is actually a `button` what you need to use, thought 
 <a href="/about#section-name">Section name</a>
 ```
 
+**Skip link**. Super useful to jump to the main content skiping navigation. Could be visually hidden only when it's not focused, so will be accessible by screen readers and keyboard users, without affect the design.
+
 ```html
 <a href="#main-content" class="visually-hidden">Skip navigation</a>
 ```
@@ -171,7 +173,9 @@ Each link must be descriptive by itself because we can navigate the page between
 
 ## Button
 
-**Button**.
+**Button**. Where ever you need and interactive element to add JS events you must use a `button`, the appearance is not relevant can be customize it. The native buttons are accesible by default, `div` instead will requiere a lot of extra work and accessibility testing.
+
+It's important to know that inside `button` the elements will be lost its semantic if for example contain headlines, also interactive elements as links or buttons cannot be nested inside another.
 
 <br />
 <button type="button" onclick="editItem()">
@@ -350,36 +354,48 @@ export const CardsList = () => {
     border: "1px solid",
     borderRadius: "8px",
     minWidth: "160px",
-    paddingBlock: " 0 24px",
+    paddingBlock: "24px",
     paddingInline: "24px 32px",
   };
   return (
     <>
       <ul>
         <li>
-          <h3>Feature</h3>
+          <p>
+            <strong>Feature</strong>
+          </p>
           <p>Description</p>
         </li>
         <li>
-          <h3>Feature</h3>
+          <p>
+            <strong>Feature</strong>
+          </p>
           <p>Description</p>
         </li>
         <li>
-          <h3>Feature</h3>
+          <p>
+            <strong>Feature</strong>
+          </p>
           <p>Description</p>
         </li>
       </ul>
       <ul role="list" style={listStyle}>
         <li style={cardStyle}>
-          <h3>Feature</h3>
+          <p>
+            <strong>Feature</strong>
+          </p>
           <p>Description</p>
         </li>
         <li style={cardStyle}>
-          <h3>Feature</h3>
+          <p>
+            <strong>Feature</strong>
+          </p>
           <p>Description</p>
         </li>
         <li style={cardStyle}>
-          <h3>Feature</h3>
+          <p>
+            <strong>Feature</strong>
+          </p>
           <p>Description</p>
         </li>
       </ul>
@@ -392,15 +408,15 @@ export const CardsList = () => {
 ```html
 <ul role="list">
   <li>
-    <h3>Feature</h3>
+    <p><strong>Feature</strong></p>
     <p>Description</p>
   </li>
   <li>
-    <h3>Feature</h3>
+    <p><strong>Feature</strong></p>
     <p>Description</p>
   </li>
   <li>
-    <h3>Feature</h3>
+    <p><strong>Feature</strong></p>
     <p>Description</p>
   </li>
 </ul>
@@ -420,36 +436,48 @@ export const StepsList = () => {
     border: "1px solid",
     borderRadius: "8px",
     minWidth: "160px",
-    paddingBlock: " 0 24px",
+    paddingBlock: "24px",
     paddingInline: "24px 32px",
   };
   return (
     <>
       <ol>
         <li>
-          <h3>Step</h3>
+          <p>
+            <strong>Step</strong>
+          </p>
           <p>Instructions</p>
         </li>
         <li>
-          <h3>Step</h3>
+          <p>
+            <strong>Step</strong>
+          </p>
           <p>Instructions</p>
         </li>
         <li>
-          <h3>Step</h3>
+          <p>
+            <strong>Step</strong>
+          </p>
           <p>Instructions</p>
         </li>
       </ol>
       <ol role="list" style={listStyle}>
         <li style={cardStyle}>
-          <h3>Step →</h3>
+          <p>
+            <strong>Step →</strong>
+          </p>
           <p>Instructions</p>
         </li>
         <li style={cardStyle}>
-          <h3>Step →</h3>
+          <p>
+            <strong>Step →</strong>
+          </p>
           <p>Instructions</p>
         </li>
         <li style={cardStyle}>
-          <h3>Step</h3>
+          <p>
+            <strong>Step</strong>
+          </p>
           <p>Instructions</p>
         </li>
       </ol>
@@ -462,15 +490,15 @@ export const StepsList = () => {
 ```html
 <ol role="list">
   <li>
-    <h3>Step</h3>
+    <p><strong>Step</strong></p>
     <p>Instructions</p>
   </li>
   <li>
-    <h3>Step</h3>
+    <p><strong>Step</strong></p>
     <p>Instructions</p>
   </li>
   <li>
-    <h3>Step</h3>
+    <p><strong>Step</strong></p>
     <p>Instructions</p>
   </li>
 </ol>
