@@ -28,7 +28,9 @@ So you know at Z1 we encourage designers and developers to use native elements a
 
 ## Links
 
-**Internal links**
+**Internal links**. The link of an internal page can be set as active with the `aria-current="page"` that way can be use as selector to add the active styles and also provide information.
+
+To add interactive actions is actually a `button` what you need to use, thought sometimes `a` can have side events like analytics triggers because navigate is still its main function.
 
 <br />
 <a href="/about/">About us</a>
@@ -45,7 +47,7 @@ So you know at Z1 we encourage designers and developers to use native elements a
 <a href="/about/" onclick="analyticsEvent()">About us</a>
 ```
 
-**Anchor links**
+**Anchor links**. To quickly navigate along the same page or to link a specific section of another page.
 
 <br />
 <a href="#section-name">Section name</a>
@@ -55,10 +57,14 @@ So you know at Z1 we encourage designers and developers to use native elements a
 ```
 
 ```html
+<a href="/about#section-name">Section name</a>
+```
+
+```html
 <a href="#main-content" class="visually-hidden">Skip navigation</a>
 ```
 
-**External links**. There is a debate about whether external links should be opened in a new tab. We are used to the fact that internal links open in the same tab and external links open in a new tab, which in terms of accessibility is an issue. So may is better to give the user the option to choose, this will probably end up being the normal behavior of the Web, indeed browsers already provide that option.
+**External links**. There is a debate about whether external links should be opened in a new tab, which in terms of accessibility is an issue. So may is better to give the user the option to choose, this will probably end up being the normal behavior of the Web, indeed browsers already provide that option.
 
 Another concern with external links is that the use of `target="_blank"` exposes to more vulnerabilities and for security reasons we must add to the `rel` attribute the values `noopener` and `noreferrer`, although most browsers have already implemented security measures.
 
@@ -87,22 +93,38 @@ Another concern with external links is that the use of `target="_blank"` exposes
 <a href="https://github.com/" rel="nofollow">GitHub</a>
 ```
 
-**Download link**
+**Download link**. The filename will be the name of the downloaded file, we can specify a value for the download attribute for that to be the new name.
 
 <br />
-<a href="./doc.pdf" download="file-name.pdf">
+<a href="./doc.pdf" download>
   Download doc
 </a>
 
 ```html
-<a href="./doc.pdf" download="file-name.pdf">Download doc</a>
+<a href="./doc.pdf" download>Download doc</a>
 ```
 
-**Image links**. If we wrap an image with a link this should have a `title` with information about the link not the image.
+```html
+<a href="./doc.pdf" download="custom-file-name.pdf">Download doc</a>
+```
+
+**Image links**. If we wrap an image with a link this should have an `alt` with information about the link.
 
 ```html
-<a href="/" title="Home">
-  <img src="./header-logo.png" alt="" />
+<a href="/">
+  <img src="./header-logo.png" alt="Home" />
+</a>
+```
+
+```html
+<a href="https://github.com/">
+  <img src="./github-logo.png" alt="GitHub" />
+</a>
+```
+
+```html
+<a href="/blog/post-title">
+  <img src="./post-thumbnail.png" alt="Post title" />
 </a>
 ```
 
@@ -115,23 +137,36 @@ Another concern with external links is that the use of `target="_blank"` exposes
 </a>
 ```
 
-**Icon links**. If the link doesn't have a text we need to include it as `title`.
+**Icon links**. If the link doesn't have a text we need to include it as `aria-label`.
 
 ```html
-<a href="#main-content" title="Back to top">
+<a href="#main-content" aria-label="Back to top">
   <svg aria-hidden="true" focusable="none" width="100" height="100"></svg>
 </a>
 ```
 
-**Descriptive links**. The text should provide information about the link, if not we can add a `title` as description.
+**Descriptive links**. The text should provide information about the link, if not we can add an `aria-label`.
+
+Thought that will replace the text inside, so an alternativa can be add the description in a `span` visually hidden but useful for screen readers and others assitive technologies.
+
+That cannot be achieved with the `hidden` attribute, nether `display: none` or `visually: hidden`, it requires a CSS class as `.visually-hidden` or `.sr-only` with special styles for that purpose.
+
+Each link must be descriptive by itself because we can navigate the page between links and not have context about where is being used.
 
 <br />
-<a href="#main-content" title="New features available">
+<a href="#main-content" aria-label="New features available">
   Learn more
 </a>
 
 ```html
-<a href="#main-content" title="New features available">Learn more</a>
+<a href="#main-content" aria-label="New features available">Learn more</a>
+```
+
+```html
+<a href="#main-content">
+  Learn more
+  <span class="visually-hidden">about new features available</span>
+</a>
 ```
 
 ## Button
@@ -642,7 +677,7 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 <header>
   <div class="wrapper">
     <nav>
-      <a href="/" title="Home">
+      <a href="/" aria-label="Home">
         <svg aria-hidden="true" focusable="none"></svg>
       </a>
       <a href="#main-content" class="visually-hidden">Skip navigation</a>
@@ -694,7 +729,7 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
             href="https://joinmastodon.org/"
             rel="noopener noreferrer nofollow"
             target="_blank"
-            title="Mastodon"
+            aria-label="Mastodon"
           >
             <svg aria-hidden="true" focusable="none"></svg>
           </a>
@@ -704,7 +739,7 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
             href="https://pixelfed.social/"
             rel="noopener noreferrer nofollow"
             target="_blank"
-            title="Pixelfed"
+            aria-label="Pixelfed"
           >
             <svg aria-hidden="true" focusable="none"></svg>
           </a>
@@ -714,7 +749,7 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
             href="https://joinpeertube.org/"
             rel="noopener noreferrer nofollow"
             target="_blank"
-            title="PeerTube"
+            aria-label="PeerTube"
           >
             <svg aria-hidden="true" focusable="none"></svg>
           </a>
