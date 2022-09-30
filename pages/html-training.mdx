@@ -6,29 +6,18 @@ This HTML guide is intended to be a quick reference on your development journey,
 
 So you know at Z1 we encourage designers and developers to use native elements as they're meant to be. The Web is accessible by default, let's not break it!
 
-- [HTML Training](#html-training)
-  - [Links](#links)
-  - [Button](#button)
-  - [Lists](#lists)
-  - [Landmarks](#landmarks)
-    - [Banner](#banner)
-    - [Navigation](#navigation)
-    - [Main](#main)
-    - [Complementary](#complementary)
-    - [Contentinfo](#contentinfo)
-    - [Region](#region)
-  - [Navigation](#navigation-1)
-    - [Header](#header)
-    - [Breadcrumb](#breadcrumb)
-    - [Footer](#footer)
-  - [Cards](#cards)
-  - [Layout](#layout)
-    - [Page](#page)
-    - [Detail](#detail)
+- [Links](#links)
+- [Button](#button)
+- [Lists](#lists)
+- [Landmarks](#landmarks)
+- [Components](#components)
+- [Layout](#layout)
 
 ## Links
 
-**Internal links**. The link of an internal page can be set as active with the `aria-current="page"` that way can be use as selector to add the active styles and also provide information.
+**Internal links**.
+
+The link of an internal page can be set as active with the `aria-current="page"` that way can be use as selector to add the active styles and also provide information.
 
 To add interactive actions is actually a `button` what you need to use, thought sometimes `a` can have side events like analytics triggers because navigate is still its main function.
 
@@ -596,110 +585,72 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 </section>
 ```
 
-## Layout
-
-### Page
-
-```html
-<header>Header</header>
-<main id="main-content">
-  <div class="fold">
-    <div class="wrapper">
-      <h1>Main title</h1>
-      <p>Subtitle</p>
-      <p>
-        Content with link to
-        <a href="#section-name">the section below</a>
-      </p>
-    </div>
-  </div>
-  <section>
-    <div class="wrapper">
-      <h2>Section title</h2>
-      <p>Subtitle</p>
-      <div class="grid">
-        <article>
-          <h3><a href="/post-title">Article title</a></h3>
-          <p>Content</p>
-        </article>
-        <article>
-          <h3><a href="/post-title">Article title</a></h3>
-          <p>Content</p>
-        </article>
-        <article>
-          <h3><a href="/post-title">Article title</a></h3>
-          <p>Content</p>
-        </article>
-      </div>
-    </div>
-  </section>
-  <section id="#section-name">
-    <div class="wrapper">
-      <h2>Section title</h2>
-      <p lang="es">Hola caracola</p>
-      <p>Content</p>
-      <p lang="fr">C'est fini</p>
-    </div>
-  </section>
-</main>
-<footer>Footer</footer>
-```
-
-### Detail
-
-```html
-<header>Header</header>
-<main id="main-content">
-  <div class="wrapper">
-    <nav>Breadcrumb</nav>
-    <article>
-      <header>
-        <h1>Article title</h1>
-        <p>Subtitle</p>
-      </header>
-      <div class="richtext">
-        <p>Content</p>
-        <h2>Title inside post<h2>
-        <p>
-          Paragraph:
-          <strong>important text</strong>
-          ,
-          <em>emphasized text</em>
-          and
-          <span class="color">text without meaning</span>
-        </p>
-        <p>
-          Content with link to
-          <a href="/about/">another post related</a>
-        </p>
-        <hr />
-        <p>Paragraph about other topic</p>
-        <hr />
-        <p>Changing subject again</p>
-        <h2>Title inside post<h2>
-        <p>Content</p>
-        <h3>Lower level title inside post<h3>
-        <p>Content</p>
-      </div>
-      <aside>Aside</aside>
-    </article>
-  </div>
-</main>
-<aside>
-  <div class="wrapper">
-    <h2>Related posts</h2>
-    <ul>
-      <li><a href="/blog/post">Post title</a></li>
-      <li><a href="/blog/post">Post title</a></li>
-    </ul>
-  </div>
-</aside>
-<footer>Footer</footer>
-```
-
 ## Components
 
-### Header
+**Breadcrumb**
+
+<br />
+<nav aria-label="Breadcrumb">
+  <p>
+    <p>
+      <a href="/blog/">Blog</a> > <a href="/blog/category">Category</a> >
+      <span>Current post</span>
+    </p>
+  </p>
+</nav>
+
+```html
+<nav aria-label="Breadcrumb">
+  <p>
+    <a href="/blog/">Blog</a>
+    >
+    <a href="/blog/category">Category</a>
+    >
+    <span>Current post</span>
+  </p>
+</nav>
+```
+
+**Accordion**
+
+<br />
+<details>
+  <summary>Details summary</summary>
+  <p>More info about the details.</p>
+</details>
+
+```html
+<details>
+  <summary>Details summary</summary>
+  <p>More info about the details.</p>
+</details>
+```
+
+**Dropdown**
+
+## Cards
+
+## Tables
+
+## Images
+
+**Picture**
+
+## Audio
+
+## Video
+
+## Forms
+
+**Input**
+
+**Progress**
+
+**Output**
+
+## Layout
+
+**Header**
 
 ```html
 <header>
@@ -735,7 +686,7 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 </header>
 ```
 
-### Footer
+**Footer**
 
 ```html
 <footer>
@@ -788,61 +739,101 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 </footer>
 ```
 
-### Breadcrumb
-
-<br />
-<nav aria-label="Breadcrumb">
-  <p>
-    <p>
-      <a href="/blog/">Blog</a> > <a href="/blog/category">Category</a> >
-      <span>Current post</span>
-    </p>
-  </p>
-</nav>
+**Page**
 
 ```html
-<nav aria-label="Breadcrumb">
-  <p>
-    <a href="/blog/">Blog</a>
-    >
-    <a href="/blog/category">Category</a>
-    >
-    <span>Current post</span>
-  </p>
-</nav>
+<header>Header</header>
+<main id="main-content">
+  <div class="fold">
+    <div class="wrapper">
+      <h1>Main title</h1>
+      <p>Subtitle</p>
+      <p>
+        Content with link to
+        <a href="#section-name">the section below</a>
+      </p>
+    </div>
+  </div>
+  <section>
+    <div class="wrapper">
+      <h2>Section title</h2>
+      <p>Subtitle</p>
+      <div class="grid">
+        <article>
+          <h3><a href="/post-title">Article title</a></h3>
+          <p>Content</p>
+        </article>
+        <article>
+          <h3><a href="/post-title">Article title</a></h3>
+          <p>Content</p>
+        </article>
+        <article>
+          <h3><a href="/post-title">Article title</a></h3>
+          <p>Content</p>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section id="#section-name">
+    <div class="wrapper">
+      <h2>Section title</h2>
+      <p lang="es">Hola caracola</p>
+      <p>Content</p>
+      <p lang="fr">C'est fini</p>
+    </div>
+  </section>
+</main>
+<footer>Footer</footer>
 ```
 
-### Accordion
-
-<br />
-<details>
-  <summary>Details summary</summary>
-  <p>More info about the details.</p>
-</details>
+**Detail**
 
 ```html
-<details>
-  <summary>Details summary</summary>
-  <p>More info about the details.</p>
-</details>
+<header>Header</header>
+<main id="main-content">
+  <div class="wrapper">
+    <nav>Breadcrumb</nav>
+    <article>
+      <header>
+        <h1>Article title</h1>
+        <p>Subtitle</p>
+      </header>
+      <div class="richtext">
+        <p>Content</p>
+        <h2>Title inside post<h2>
+        <p>
+          Paragraph:
+          <strong>important text</strong>
+          ,
+          <em>emphasized text</em>
+          and
+          <span class="color">text without meaning</span>
+        </p>
+        <p>
+          Content with link to
+          <a href="/about/">another post related</a>
+        </p>
+        <hr />
+        <p>Paragraph about other topic</p>
+        <hr />
+        <p>Changing subject again</p>
+        <h2>Title inside post<h2>
+        <p>Content</p>
+        <h3>Lower level title inside post<h3>
+        <p>Content</p>
+      </div>
+      <aside>Aside</aside>
+    </article>
+  </div>
+</main>
+<aside>
+  <div class="wrapper">
+    <h2>Related posts</h2>
+    <ul>
+      <li><a href="/blog/post">Post title</a></li>
+      <li><a href="/blog/post">Post title</a></li>
+    </ul>
+  </div>
+</aside>
+<footer>Footer</footer>
 ```
-
-### Dropdown
-
-## Cards
-
-## Tables
-
-## Picture
-
-## Audio
-
-## Video
-
-## Forms
-
-### Input
-
-### Progress
-
-### Output
