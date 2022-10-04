@@ -11,6 +11,7 @@ So you know at Z1 we encourage designers and developers to use native elements a
 - [Lists](#lists)
 - [Landmarks](#landmarks)
 - [Components](#components)
+- [Images](#images)
 - [Layout](#layout)
 
 ## Links
@@ -678,9 +679,9 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 
 ```html
 <picture>
-  <source srcset="fold-background.png" media="(min-width: 767px)" />
+  <source srcset="./fold-background.png" media="(min-width: 767px)" />
   <img
-    src="fold-backgroud-mobile.png"
+    src="./fold-backgroud-mobile.png"
     width="1200"
     height="400"
     loading="lazy"
@@ -691,7 +692,7 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 
 ```html
 <picture>
-  <source srcset=".picture.webp" type="image/webp" />
+  <source srcset="./picture.webp" type="image/webp" />
   <img
     src="./picture.png"
     width="400"
