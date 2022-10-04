@@ -11,6 +11,7 @@ So you know at Z1 we encourage designers and developers to use native elements a
 - [Lists](#lists)
 - [Landmarks](#landmarks)
 - [Components](#components)
+- [Cards](#cards)
 - [Images](#images)
 - [Layout](#layout)
 
@@ -630,6 +631,45 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 **Dropdown**
 
 ## Cards
+
+```html
+<article>
+  <img src="./post-thumbnail.png" alt="Feature name" />
+  <h3>Feature name</h3>
+  <p>Description</p>
+  <a href="/item-title">
+    Learn more <span class="visually-hidden">about feature name<span>
+  </a>
+</article>
+```
+
+```html
+<article>
+  <a href="/item-title">
+    <img src="./item-thumbnail.png" alt="Item title" />
+  </a>
+  <h3>
+    <a href="/item-title">Item title</a>
+  </h3>
+  <p>Item description</p>
+  <ul>
+    <li>Category</li>
+    <li>Type</li>
+    <li>Prices</li>
+  </ul>
+</article>
+```
+
+```html
+<article>
+  <img src="./item-thumbnail.png" alt="Item title" />
+  <h3>Item title</h3>
+  <p>Item description</p>
+  <a href="/item-title">
+    <span class="visually-hidden">Item title<span>
+  </a>
+</article>
+```
 
 ## Tables
 
