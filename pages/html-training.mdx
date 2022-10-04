@@ -634,7 +634,73 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 
 ## Images
 
+**2x images**
+
+```html
+<img
+  src="./background.png"
+  srcset="./background@2x.png 2x"
+  width="1200"
+  height="900"
+  loading="lazy"
+  alt=""
+/>
+```
+
+```html
+<img
+  src="./photo.png"
+  srcset="./photo@2x.png 2x"
+  width="400"
+  height="600"
+  loading="lazy"
+  alt="Photo description"
+/>
+```
+
+**SVG images**
+
+```html
+<img src="./gradient.svg" width="900" height="700" loading="lazy" alt="" />
+```
+
+```html
+<img
+  src="./illustration.svg"
+  width="700"
+  height="300"
+  loading="lazy"
+  alt="Illustration description"
+/>
+```
+
 **Picture**
+
+```html
+<picture>
+  <source srcset="fold-background.png" media="(min-width: 767px)" />
+  <img
+    src="fold-backgroud-mobile.png"
+    width="1200"
+    height="400"
+    loading="lazy"
+    alt=""
+  />
+</picture>
+```
+
+```html
+<picture>
+  <source srcset=".picture.webp" type="image/webp" />
+  <img
+    src="./picture.png"
+    width="400"
+    height="400"
+    loading="lazy"
+    alt="Picture description"
+  />
+</picture>
+```
 
 ## Audio
 
