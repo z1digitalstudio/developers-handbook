@@ -630,6 +630,39 @@ So if the section it's not going to be a landmark, what if we use `div` instead,
 
 **Dropdown**
 
+```html
+<div class="dropdown">
+  <button
+    onclick="openDropdown()"
+    aria-expanded="false"
+    aria-controls="actions-menu"
+    aria-label="Actions item name"
+  >
+    <svg aria-hidden="true"></svg>
+  </button>
+  <ul role="list" id="actions-menu" style="display:none">
+    <li>
+      <button onclick="duplicateItem()">
+        Duplicate
+        <span class="visually-hidden">item name</span>
+      </button>
+    </li>
+    <li>
+      <button onclick="editItem()">
+        Edit
+        <span class="visually-hidden">item name</span>
+      </button>
+    </li>
+    <li>
+      <button onclick="removeItem()">
+        Remove
+        <span class="visually-hidden">item name</span>
+      </button>
+    </li>
+  </ul>
+</div>
+```
+
 ## Cards
 
 ```html
