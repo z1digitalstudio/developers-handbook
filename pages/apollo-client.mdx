@@ -61,7 +61,7 @@ In this case, on some event we are fetching data via getSource (which is making 
 
 ###### [Give to Apollo what is Apollo's, and what is the component's to the component [06](#point-06)]
 
-As we do with queries, we group mutations affecting the same source or related sources in hooks under the naming use<Source>Actions. Here, we can return custom handlers that, apart from calling the mutation, perform actions like field normalization, Apollo's cache updates, or side effects that are no related with the component that calls the mutation on the hook and returning it from there. If we export the mutation directly from our custom hook, we are missing some of the advantages of calling them from a custom hook.
+As we do with queries, we group mutations affecting the same source or related sources in hooks under the naming `use<Source>Actions`. Here, we can return custom handlers that, apart from calling the mutation, perform actions like field normalization, Apollo's cache updates, or side effects that are no related with the component that calls the mutation on the hook and returning it from there. If we export the mutation directly from our custom hook, we are missing some of the advantages of calling them from a custom hook.
 
 ###### [Keep the client's cache up to date [07](#point-07)]
 
