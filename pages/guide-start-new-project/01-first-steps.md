@@ -57,7 +57,7 @@ Optionally, you could upgrade Yarn version to [Yarn 2](https://yarnpkg.com/getti
 ````
 yarn set version berry
 ````
-````markdown
+
 <details><summary>Learn more</summary>
 <p>
 
@@ -67,7 +67,6 @@ Yarn 2 (Berry) is not just a completely new version of Yarn 1 (Classic). It's a 
 
 </p>
 </details>
-````
 
 
 At the time we wrote this, we added the following line to the  `.yarnrc.yml`  file to use node modules instead of pnp as the last one is yet not supported by some packages. More info can be found in the [Yarn Configuration Options Docs](https://yarnpkg.com/configuration/yarnrc#nodeLinker).
