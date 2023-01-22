@@ -13,8 +13,7 @@ Yarn se introdujo en el 2016 como competencia de `npm`, mejorando muchos aspecto
 En 2020, aparece Yarn 2. Yarn 2 causó una gran polémica, porque no se trata de una nueva versión de Yarn, si no de una forma completamente nueva de lidiar con las dependencias del sistema, que rompe con tanto con Yarn 1 como con npm. 
 La motivación de Yarn 2 es solucionar "el problema de node modules", que para no entrar en detalles, podemos resumir con una imagen:
 
-
-![[node-modules-heaviest.webp]]
+![Node modules](/node-modules-heaviest.webp)
 
 Típicamente para resolver una referencia, node busca en node_modules por el archivo requerido. Es una operación llamada resolve. Es como se ha hecho siempre. Los gestores de paquetes tiene que ser compatibles con la lógica de resolución de node. La manera de node es copiar achivos en node_modules. Esto lleva tiempo, además node_modules se convierte en un directorio muy pesado. 
 
