@@ -1,6 +1,6 @@
 # HTML Training
 
-The next HTML snippets are examples of an accessible and SEO friendly semantic code, there are other ways to achieve the same results. These are based on the of the best practices conventions and our dev experience dealing with UI hacks.
+The next HTML snippets are examples of an accessible and SEO friendly semantic code, there are other ways to achieve the same results. These are based on the best practices conventions and our dev experience dealing with UI hacks.
 
 This HTML guide is intended to be a quick reference on your development journey, for a deeper understanding we highly recommend [MDN Web Docs](https://developer.mozilla.org/) and the blogs listed in [UI Markers](/ui-markers).
 
@@ -19,6 +19,8 @@ The link of an internal page can be set as active with the `aria-current="page"`
 
 To add interactive actions is actually a `button` what you need to use, thought sometimes `a` can have side events like analytics triggers because navigate is still its main function.
 
+Using `rel="nofollow"` in our internal links not important for SEO can help with pages prioritation because search engines don't trace nofollow links.
+
 <br />
 <a href="/about/">About us</a>
 
@@ -32,6 +34,10 @@ To add interactive actions is actually a `button` what you need to use, thought 
 
 ```html
 <a href="/about/" onclick="analyticsEvent()">About us</a>
+```
+
+```html
+<a href="/about/" rel="nofollow">Privacy Policy</a>
 ```
 
 **Anchor links**. To quickly navigate along the same page or to link a specific section of another page. Adding an `id` to the element and using it behind the page `path` will have ready this awesome feature.
@@ -57,6 +63,10 @@ To add interactive actions is actually a `button` what you need to use, thought 
 
 Another concern with external links is that the use of `target="_blank"` exposes to more vulnerabilities and for security reasons we must add to the `rel` attribute the values `noopener` and `noreferrer`, although most browsers have already implemented security measures.
 
+Followed links give SEO benefits to the link referred, so Google states that all paid links should be nofollowed. Because of that use `rel="nofollow"` in external links can protect against Google penailties.
+
+So with that in mind we should add `nofollow` to social media links and big companies for example, don't use it only in links of websites that you want to rewards with organic SEO, like independent blogs or open source projects, those could be followed links.
+
 <br />
 <a href="https://some-blog.com" rel="noopener noreferrer" target="_blank">
   Some blog
@@ -74,12 +84,16 @@ Another concern with external links is that the use of `target="_blank"` exposes
 
 ```html
 <a href="https://marketing-partner.com" onclick="analyticsEvent()">
-  Marketing partner
+  Marketing landing
 </a>
 ```
 
 ```html
 <a href="https://github.com/" rel="nofollow">GitHub</a>
+```
+
+```html
+<a href="https://project.org">Project</a>
 ```
 
 **Download link**. The filename will be the name of the downloaded file, we can specify a value for the download attribute for that to be the new name.
