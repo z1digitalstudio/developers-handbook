@@ -131,12 +131,12 @@ So with that in mind we should add `nofollow` to social media links and big comp
 </a>
 ```
 
-**Link with icon**. Any `svg` icon that is decorative or his meaning is redundant should have `aria-hidden` to no disturb the user experience and `focusable="none"` to prevent interact with this element.
+**Link with icon**. Any `svg` icon that is decorative or his meaning is redundant should have `aria-hidden` to no disturb the user experience.
 
 ```html
 <a href="/post">
   Next post
-  <svg aria-hidden="true" focusable="none"></svg>
+  <svg aria-hidden="true"></svg>
 </a>
 ```
 
@@ -144,7 +144,7 @@ So with that in mind we should add `nofollow` to social media links and big comp
 
 ```html
 <a href="#main-content" aria-label="Back to top">
-  <svg aria-hidden="true" focusable="none" width="100" height="100"></svg>
+  <svg aria-hidden="true" width="100" height="100"></svg>
 </a>
 ```
 
@@ -157,16 +157,16 @@ That cannot be achieved with the `hidden` attribute, nether `display: none` or `
 Each link must be descriptive by itself because we can navigate the page between links and not have context about where is being used.
 
 <br />
-<a href="#main-content" aria-label="New features available">
+<a href="/features" aria-label="New features available">
   Learn more
 </a>
 
 ```html
-<a href="#main-content" aria-label="New features available">Learn more</a>
+<a href="/features" aria-label="New features available">Learn more</a>
 ```
 
 ```html
-<a href="#main-content">
+<a href="/features">
   Learn more
   <span class="visually-hidden">about new features available</span>
 </a>
@@ -187,20 +187,27 @@ It's important to know that inside `button` the elements will be lost its semant
 <button type="button" onclick="editItem()">Edit item</button>
 ```
 
-**Button with icon**.
+**Button with icon**. Same that links, the icon should have `aria-hidden`.
 
 ```html
 <button type="button" onclick="addItem()">
   Add new item
-  <svg aria-hidden="true" focusable="none"></svg>
+  <svg aria-hidden="true"></svg>
 </button>
 ```
 
-**Icon button**.
+**Icon button**. As links if a button doesn't have text we need to add it with `aria-label` or visually hidden.
 
 ```html
 <button type="button" onclick="removeItem()" aria-label="Remove item">
-  <svg aria-hidden="true" focusable="none"></svg>
+  <svg aria-hidden="true"></svg>
+</button>
+```
+
+```html
+<button type="button" onclick="editItem()">
+  <svg aria-hidden="true"></svg>
+  <span class="visually-hidden">Edit item details</span>
 </button>
 ```
 
