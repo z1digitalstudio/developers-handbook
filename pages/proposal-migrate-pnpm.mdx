@@ -114,8 +114,8 @@ He creado una nueva rama en Baselang, para migrar a pnpm, de la misma manera que
 - He instalado `pnpm`. La documentación ofrece muchas maneras de hacerlo, yo lo he hecho con `brew`
 - He corrido el comando `pnpm import`, que toma la información de los archivos .lock para crear el archivo `pnp-lock.yml`
 - He borrado los archivos de configuración de yarn y he sustituido las referencias a yarn por referencias a pnpm.
-- He lanzando `yarn start`. Ha funcionado.
-- He lanzando `yarn build`. Ha funcionado.
+- He lanzando `pnpm start`. Ha funcionado.
+- He lanzando `pnpm build`. Ha funcionado.
 
 Honestamente, pensaba que me iba a encontrar con muchos errores, especialmente migrando desde Yarn en lugar de desde npm, pero no ha sido así. Por supuesto, serían necesarias más pruebas y actualizar nuestros flujos de CI para que fueran compatibles con pnpm (desconozco si existirán impedimentos mayores ahí).
 
