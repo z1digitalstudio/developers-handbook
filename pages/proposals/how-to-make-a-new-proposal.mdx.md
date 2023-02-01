@@ -1,0 +1,39 @@
+
+# How to make a new proposal
+
+
+## What is a proposal?
+
+Writing a proposal is a mechanism at your disposal as a member of the Z1 front-end team. If there is an idea or practice you think is valuable and you would like to share it with rest of the team, a proposal is a great mean to raise your voice and make an effective change in the way we work. 
+
+This is a much more straightforward method to achieve what you want than bringing the topic in a meeting or mentioning it to part of the team. The reason being that you can formalize your idea in a clear and defined way, avoiding vagueness, and the rest of the team can read it, ask specific questions and design a plan of action to implement it.
+
+At the very least, you will create awareness in the team about the topics you care for. As best, the whole team will benefit of the approaches exposed in your proposal and take them as their own.
+
+
+## What topics can be subject of my proposal?
+
+The proposals you can make through the *Developers Handbook* are **technical in nature**. For example, you can make new proposals about:
+
+- Your experiences using a new library, framework, tool, extension, tool, etc.
+- The introduction of tools for improving DX or any other aspect of the dev process.
+- Thoughts on architecture, design patterns or projects structure
+- Conventions you will like to follow (or stop following if you thing they're damaging!)
+- Ideas about git workflows
+- ...
+
+Most probably these are things you have learn during your work in one of your projects (or elsewhere!) and you would like to elevate them. If you have ideas about team collaboration, organization, etc. outside the scope of the projects (mentoring, pair programming, onboarding, meetings, 1:1, etc.), you can communicate them openly at the front-end meetings, through slack channels or via 1:1s with some team manager.
+
+
+## How does it work?
+
+Very simple. To make a proposal you just need to:
+
+- Clone this repository
+- Create a new .mdx file at `/proposals` folder. **Be specific with your content**. Don't propose about things you only heard of or you have not researched and tried first. Include some milestones or steps you would like to follow in its approval. The proposal does not need to be extensive but it needs to be specific.
+- Once you're finished, create a pull request with your proposal. 
+- Let everybody know! Write a message at the `z1-frontend` channel sharing your proposal. A good idea is to give an specific deadline for the team to review it.
+- Team can make questions and suggestion by reviewing your PR.
+- After deadline, team management will communicate the plan of action for the proposal to be implemented or the reasons why is not being moving forward.
+
+Thank you for making a better team!
