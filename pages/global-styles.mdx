@@ -1,0 +1,83 @@
+# Global styles
+
+Create a file called global.ts within the styles folder and paste the following code. Under GlobalStyle, general style rules are defined for the entire project.
+
+```
+import { createGlobalStyle } from 'styled-components';
+import { normalize } from 'styled-normalize';
+
+const GlobalStyle = createGlobalStyle`
+  ${normalize}
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+    text-rendering: optimizeLegibility;
+	  font-feature-settings: "liga","kern"
+	  font-variant-numeric: proportional-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  #__next {
+    display: flex;
+    min-height: 100vh;
+
+    > * {
+      flex: 1;
+    }
+  }
+
+  *,
+  *::before,
+  *::after
+  {
+  box-sizing: border-box;
+  }
+
+
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  ul,
+  ol,
+  li,
+  figure,
+  figcaption,
+  blockquote,
+  dl,
+  dd {
+    margin: 0;
+  }
+
+  ul {
+  list-style: none;
+  }
+
+  ul,
+  ol,
+  dl,
+  dd,
+  menu {
+    padding: 0;
+  }
+
+  fieldset {
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+`;
+
+export default GlobalStyle;
+```

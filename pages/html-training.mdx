@@ -1,0 +1,605 @@
+# HTML Training
+
+The next HTML snippets are examples of an accessible and SEO friendly semantic code, there are other ways to achieve the same results. These are based on the best practices conventions and our dev experience dealing with UI hacks.
+
+This HTML guide is intended to be a quick reference on your development journey, for a deeper understanding we highly recommend [MDN Web Docs](https://developer.mozilla.org/) and the blogs listed in [UI Markers](/ui-markers).
+
+So you know at Z1 we encourage designers and developers to use native elements as they're meant to be. The Web is accessible by default, let's not break it!
+
+- [Links](#links)
+- [Button](#button)
+- [Lists](#lists)
+- [Landmarks](#landmarks)
+
+## Links
+
+**Internal links**.
+
+The link of an internal page can be set as active with the `aria-current="page"` that way can be use as selector to add the active styles and also provide information.
+
+To add interactive actions is actually a `button` what you need to use, thought sometimes `a` can have side events like analytics triggers because navigate is still its main function.
+
+Using `rel="nofollow"` in our internal links not important for SEO can help with pages prioritation because search engines don't trace nofollow links.
+
+<br />
+<a href="/about/">About us</a>
+
+```html
+<a href="/about/">About us</a>
+```
+
+```html
+<a href="/about/" aria-current="page">About us</a>
+```
+
+```html
+<a href="/about/" onclick="analyticsEvent()">About us</a>
+```
+
+```html
+<a href="/about/" rel="nofollow">Privacy Policy</a>
+```
+
+**Anchor links**. To quickly navigate along the same page or to link a specific section of another page. Adding an `id` to the element and using it behind the page `path` will have ready this awesome feature.
+
+<br />
+<a href="#section-name">Section name</a>
+
+```html
+<a href="#section-name">Section name</a>
+```
+
+```html
+<a href="/about#section-name">Section name</a>
+```
+
+**Skip link**. Super useful to jump to the main content skiping navigation. Could be visually hidden only when it's not focused, so will be accessible by screen readers and keyboard users, without affect the design.
+
+```html
+<a href="#main-content" class="visually-hidden">Skip navigation</a>
+```
+
+**External links**. There is a debate about whether external links should be opened in a new tab, which in terms of accessibility is an issue. So may is better to give the user the option to choose, this will probably end up being the normal behavior of the Web, indeed browsers already provide that option.
+
+Another concern with external links is that the use of `target="_blank"` exposes to more vulnerabilities and for security reasons we must add to the `rel` attribute the values `noopener` and `noreferrer`, although most browsers have already implemented security measures.
+
+Followed links give SEO benefits to the link referred, so Google states that all paid links should be nofollowed. Because of that use `rel="nofollow"` in external links can protect against Google penailties.
+
+So with that in mind we should add `nofollow` to social media links and big companies for example, don't use it only in links of websites that you want to rewards with organic SEO, like independent blogs or open source projects, those could be followed links.
+
+<br />
+<a href="https://some-blog.com" rel="noopener noreferrer" target="_blank">
+  Some blog
+</a>
+
+```html
+<a href="https://some-blog.com" rel="noopener noreferrer" target="_blank">
+  Some blog
+</a>
+```
+
+```html
+<a href="https://some-blog.com">Some blog</a>
+```
+
+```html
+<a href="https://marketing-partner.com" onclick="analyticsEvent()">
+  Marketing landing
+</a>
+```
+
+```html
+<a href="https://github.com/" rel="nofollow">GitHub</a>
+```
+
+```html
+<a href="https://project.org">Project</a>
+```
+
+**Download link**. The filename will be the name of the downloaded file, we can specify a value for the download attribute for that to be the new name.
+
+<br />
+<a href="./doc.pdf" download>
+  Download doc
+</a>
+
+```html
+<a href="./doc.pdf" download>Download doc</a>
+```
+
+```html
+<a href="./doc.pdf" download="custom-file-name.pdf">Download doc</a>
+```
+
+**Image links**. If we wrap an image with a link this should have an `alt` with information about the link.
+
+```html
+<a href="/">
+  <img src="./header-logo.png" alt="Home" />
+</a>
+```
+
+```html
+<a href="https://github.com/">
+  <img src="./github-logo.png" alt="GitHub" />
+</a>
+```
+
+```html
+<a href="/blog/post-title">
+  <img src="./post-thumbnail.png" alt="Post title" />
+</a>
+```
+
+**Link with icon**. Any `svg` icon that is decorative or his meaning is redundant should have `aria-hidden` to no disturb the user experience.
+
+```html
+<a href="/post">
+  Next post
+  <svg aria-hidden="true"></svg>
+</a>
+```
+
+**Icon links**. If the link doesn't have a text we need to include it as `aria-label`.
+
+```html
+<a href="#main-content" aria-label="Back to top">
+  <svg aria-hidden="true" width="100" height="100"></svg>
+</a>
+```
+
+**Descriptive links**. The text should provide information about the link, if not we can add an `aria-label`.
+
+Thought that will replace the text inside, so an alternativa can be add the description in a `span` visually hidden but useful for screen readers and others assitive technologies.
+
+That cannot be achieved with the `hidden` attribute, nether `display: none` or `visually: hidden`, it requires a CSS class as `.visually-hidden` or `.sr-only` with special styles for that purpose.
+
+Each link must be descriptive by itself because we can navigate the page between links and not have context about where is being used.
+
+<br />
+<a href="/features" aria-label="New features available">
+  Learn more
+</a>
+
+```html
+<a href="/features" aria-label="New features available">Learn more</a>
+```
+
+```html
+<a href="/features">
+  Learn more
+  <span class="visually-hidden">about new features available</span>
+</a>
+```
+
+## Button
+
+**Button**. Where ever you need and interactive element to add JS events you must use a `button`, the appearance is not relevant can be customize it. The native buttons are accesible by default, `div` instead will requiere a lot of extra work and accessibility testing.
+
+It's important to know that inside `button` the elements will be lost its semantic if for example contain headlines, also interactive elements as links or buttons cannot be nested inside another.
+
+<br />
+<button type="button" onclick="editItem()">
+  Edit item
+</button>
+
+```html
+<button type="button" onclick="editItem()">Edit item</button>
+```
+
+**Button with icon**. Same that links, the icon should have `aria-hidden`.
+
+```html
+<button type="button" onclick="addItem()">
+  Add new item
+  <svg aria-hidden="true"></svg>
+</button>
+```
+
+**Icon button**. As links if a button doesn't have text we need to add it with `aria-label` or visually hidden.
+
+```html
+<button type="button" onclick="removeItem()" aria-label="Remove item">
+  <svg aria-hidden="true"></svg>
+</button>
+```
+
+```html
+<button type="button" onclick="editItem()">
+  <svg aria-hidden="true"></svg>
+  <span class="visually-hidden">Edit item details</span>
+</button>
+```
+
+## Lists
+
+**Unordered list**.
+
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>Item</li>
+</ul>
+
+```html
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>Item</li>
+</ul>
+```
+
+**Ordered list**.
+
+<ol>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ol>
+
+```html
+<ol>
+  <li>A</li>
+  <li>B</li>
+  <li>C</li>
+</ol>
+```
+
+**Reversed ordered list**.
+
+<ol reversed>
+  <li>C</li>
+  <li>B</li>
+  <li>A</li>
+</ol>
+
+```html
+<ol reversed>
+  <li>C</li>
+  <li>B</li>
+  <li>A</li>
+</ol>
+```
+
+**List without bullets**. If you use `list-style: none` to remove the bullets of a list the element will be considered no longer a list, so you need to add `role="list"` to recover its meaning. Be aware that in some cases like this CSS styles may affect the semantic and accessibility of HTML elements.
+
+export const ListWithoutBullets = () => {
+  const listStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+  };
+  const rowlistStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+    display: "flex",
+    gap: "12px",
+  };
+  return (
+    <>
+      <ul>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+      </ul>
+      <ul role="list" style={rowlistStyle}>
+        <li>Item</li>
+        <li>Item</li>
+        <li>Item</li>
+      </ul>
+    </>
+  );
+};
+
+<ListWithoutBullets />
+
+```html
+<ul role="list">
+  <li>Item</li>
+  <li>Item</li>
+  <li>Item</li>
+</ul>
+```
+
+**Nested lists**. We can nest a list inside another and we can have multiple lists nested. The correct markup will be always do it inside a `li`, because only `li` can be direct child of `ul` and `ol`. For example we shouldn't use `div` to group the list items, that would break the semantic structure.
+
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>
+    <p>Item list</p>
+    <ul>
+      <li>Item</li>
+      <li>Item</li>
+      <li>
+        <p>Item list</p>
+        <ol>
+          <li>Item</li>
+          <li>Item</li>
+          <li>Item</li>
+        </ol>
+      </li>
+      <li>Item</li>
+    </ul>
+  </li>
+  <li>Item</li>
+</ul>
+
+```html
+<ul>
+  <li>Item</li>
+  <li>Item</li>
+  <li>
+    <p>Item list</p>
+    <ul>
+      <li>Item</li>
+      <li>Item</li>
+      <li>
+        <p>Item list</p>
+        <ol>
+          <li>Item</li>
+          <li>Item</li>
+          <li>Item</li>
+        </ol>
+      </li>
+      <li>Item</li>
+    </ul>
+  </li>
+  <li>Item</li>
+</ul>
+```
+
+**Cards list**. The li element can contain any HTML element so we can use ul for many common UI patterns, like a list of features with title and text, could use `ul` even if they look like cards, semantically it is a list.
+
+export const CardsList = () => {
+  const listStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "24px",
+  };
+  const cardStyle = {
+    border: "1px solid",
+    borderRadius: "8px",
+    minWidth: "160px",
+    paddingBlock: "24px",
+    paddingInline: "24px 32px",
+  };
+  return (
+    <>
+      <ul>
+        <li>
+          <p>
+            <strong>Feature</strong>
+          </p>
+          <p>Description</p>
+        </li>
+        <li>
+          <p>
+            <strong>Feature</strong>
+          </p>
+          <p>Description</p>
+        </li>
+        <li>
+          <p>
+            <strong>Feature</strong>
+          </p>
+          <p>Description</p>
+        </li>
+      </ul>
+      <ul role="list" style={listStyle}>
+        <li style={cardStyle}>
+          <p>
+            <strong>Feature</strong>
+          </p>
+          <p>Description</p>
+        </li>
+        <li style={cardStyle}>
+          <p>
+            <strong>Feature</strong>
+          </p>
+          <p>Description</p>
+        </li>
+        <li style={cardStyle}>
+          <p>
+            <strong>Feature</strong>
+          </p>
+          <p>Description</p>
+        </li>
+      </ul>
+    </>
+  );
+};
+
+<CardsList />
+
+```html
+<ul role="list">
+  <li>
+    <p><strong>Feature</strong></p>
+    <p>Description</p>
+  </li>
+  <li>
+    <p><strong>Feature</strong></p>
+    <p>Description</p>
+  </li>
+  <li>
+    <p><strong>Feature</strong></p>
+    <p>Description</p>
+  </li>
+</ul>
+```
+
+**Steps list**. Same for steps of any kind, some have numbers others have arrows, we can use `ol` because however they look like regarding to semantics they are ordered lists. If the arrows go in the other direction use the `reversed` atribute for this markup to have the same meaning as it does visually.
+
+export const StepsList = () => {
+  const listStyle = {
+    listStyle: "none",
+    marginInlineStart: "0",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "24px",
+  };
+  const cardStyle = {
+    border: "1px solid",
+    borderRadius: "8px",
+    minWidth: "160px",
+    paddingBlock: "24px",
+    paddingInline: "24px 32px",
+  };
+  return (
+    <>
+      <ol>
+        <li>
+          <p>
+            <strong>Step</strong>
+          </p>
+          <p>Instructions</p>
+        </li>
+        <li>
+          <p>
+            <strong>Step</strong>
+          </p>
+          <p>Instructions</p>
+        </li>
+        <li>
+          <p>
+            <strong>Step</strong>
+          </p>
+          <p>Instructions</p>
+        </li>
+      </ol>
+      <ol role="list" style={listStyle}>
+        <li style={cardStyle}>
+          <p>
+            <strong>Step →</strong>
+          </p>
+          <p>Instructions</p>
+        </li>
+        <li style={cardStyle}>
+          <p>
+            <strong>Step →</strong>
+          </p>
+          <p>Instructions</p>
+        </li>
+        <li style={cardStyle}>
+          <p>
+            <strong>Step</strong>
+          </p>
+          <p>Instructions</p>
+        </li>
+      </ol>
+    </>
+  );
+};
+
+<StepsList />
+
+```html
+<ol role="list">
+  <li>
+    <p><strong>Step</strong></p>
+    <p>Instructions</p>
+  </li>
+  <li>
+    <p><strong>Step</strong></p>
+    <p>Instructions</p>
+  </li>
+  <li>
+    <p><strong>Step</strong></p>
+    <p>Instructions</p>
+  </li>
+</ol>
+```
+
+## Landmarks
+
+Use the appropriate landmarks to identify the different regions of content on a web page. The most important landmark roles are `main` and `navigation`, as nearly every page will include at least those regions.
+
+Use HTML5 sectioning elements that have a default ARIA landmark role: `main (main)`, `nav (navigation)`, `aside (complementary)` and in some situations `header (banner)` and `footer (contentinfo)`. Do not nest landmarks with the same role.
+
+**Banner**. The element `header` has banner role by default, is commonly use for the top navbar that contain the main navigation and is the same on all pages.
+
+Could be a sidebar as well, that's common in web applications, appearance is not as important as semantics in identifying whether it is a header. The main `header` should be only one and cannot be nested inside another, but we can use it as a header of an `article`.
+
+```html
+<header>Site header</header>
+<main>
+  <article>
+    <header>Article header</header>
+  </article>
+</main>
+```
+
+**Main**. The `main` landmark contain the most important and unique content of each page. Should be only one and cannot be nested inside another.
+
+```html
+<main>Main</main>
+```
+
+**Complementary**. The `aside` with complementary role is, as its name indicates, additional to the main content, it contains elements related to the main content but it is something extra, not so important.
+
+Can be use next to the `main` or inside an `article`. A few examples or `aside` can be related posts, shared links, banners, advertising, etc. Again appearance is not decisive, there may be multiple asides.
+
+```html
+<main>
+  <article>
+    <aside>Share links</aside>
+  </article>
+</main>
+<aside>Related posts</aside>
+```
+
+**Contentinfo**. The `footer` contain information about the site or related as navigation, contact, social links.
+The main `footer` should be only one and cannot be nested inside another, so like `header` and `aside` could be use inside `article`.
+
+```html
+<main>
+  <article>
+    <footer>Author info</footer>
+  </article>
+</main>
+<footer>Footer</footer>
+```
+
+**Navigation**. The `nav` tag should be use when a container has links to pages or links related to the website. The main navigation appears in the `header`, some others can be use across the pages in the `main` content, like breadcrumb or tabs and listed in the `footer`.
+
+The secodary navigations will need an `aria-label`, it's not necessary to include descriptive words like menu, navigation or links as the semantic tags will annouce by itself. Shouldn't be nested inside another.
+
+```html
+<header>
+  <nav>Main navigation</nav>
+</header>
+<main>
+  <nav aria-label="Breadcrumb">Secondary navigation</nav>
+  <nav aria-label="Categories">Secondary navigation</nav>
+</main>
+<footer>
+  <nav aria-label="Legal">Secondary navigation</nav>
+  <nav aria-label="Social">Secondary navigation</nav>
+</footer>
+```
+
+**Region**. An alternative landmark can be created using the `section` element, which has a default landmark role of region, with an accessible name using `aria-labelledby` to reference a heading element
+
+```html
+<section aria-labelledby="this-section">
+  <h2 id="this-section">Section as landmark</h2>
+</section>
+```
+
+Keep in mind that too many landmark roles create "noise" in screen readers, making it difficult to understand the overall layout of the page.
+
+So if the section it's not going to be a landmark, what if we use `div` instead, is that wrong? not at all, it would be the same, just that `section` is semantic so the code look nicer :)
+
+```html
+<div>
+  <h2>Section title</h2>
+</div>
+```
+
+```html
+<section>
+  <h2>Section title</h2>
+</section>
+```

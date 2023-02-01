@@ -7,5 +7,8 @@
   "apollo-client": "Apollo client",
   "docs": "Docs",
   "ui-makers": "UI Makers",
-  "proposal-migrate-pnpm": "Proposal. Migración a pnpm desde Yarn Berry"
+  "how-to-make-a-new-proposal": "How to make a new proposal",
+  "proposal-migrate-pnpm": "Proposal. Migración a pnpm desde Yarn Berry",
+  "html-training": "HTML Training",
+  "global-styles": "Global styles"
 }
