@@ -1,0 +1,168 @@
+
+# Proposal. Migración a pnpm desde Yarn Berry
+
+---
+- 🇪🇸 Idioma: Español
+- 😸 Autora: María Simó
+- 🗓️ Creado: 22/01/2023
+- 🚀 Aprobada: 01/02/2023
+
+---
+
+
+> Yarn Berry lleva operativo desde 2020. Lo adoptamos en 2021 en la medida en que esto era posible (más sobre esto luego).  Han pasado más de dos años y estamos asumiendo las peculiaridades de su modo de configuración sin hacernos beneficiarios de su principal ventaja, la feature de *Plug and Play (PnP)*. 
+> 
+> Durante este tiempo, trabajar con esta herramienta se ha vuelto transparente para nosotros. Funciona (casi siempre), así que no pensamos más en ello. Es hora de hacer una toma de decisión consciente sobre cómo gestionar las dependencias de nuestras aplicaciones. 
+> 
+> En este artículo se explica a alto nivel qué son los gestores de paquetes de node, qué es Yarn Classic, Yarn Berry, cuáles son sus diferencias, y cuáles son las limitaciones y desventajas de Yarn Berry de acuerdo al uso actual que le damos en nuestros proyectos. Como alternativa, se propone el uso de **pnpm** y se explican sus ventajas con respecto a Yarn Berry y npm.
+
+
+## ¿Qué es Yarn?
+Yarn es un gestor de paquetes de node. Nos ayuda a controlar las dependencias de la aplicación. Los gestores de paquetes nacieron en 2010 con npm, que introdujo el concepto de `package.json` , un archivo de manifiesto donde declarar las dependencias, y el directorio de `node_modules`, para almacenarlas. También introdujo scripts para automatizar la instalación y actualización de dependencias. Antes, todo eso se hacía manualmente.
+
+Yarn apareció en el 2016 como competencia de `npm`, mejorando muchos aspectos de consistencia, perfomance y seguridad, con los que `npm` había sido negligente a pesar de las peticiones de sus usuarios. Esto le valió una rápida adopción. Con el tiempo, `npm` reaccionó a la entrada de `yarn` e incorporó muchas de sus features.
+
+## ¿Qué es Yarn Berry?
+
+### El producto
+En 2020, aparece Yarn 2 (aka Yarn Berry). Yarn 2 causó una gran polémica, porque no se trata de una nueva versión de Yarn, si no de una forma completamente nueva de lidiar con las dependencias, que rompía tanto con Yarn 1 como con npm. 
+La motivación de Yarn 2 es solucionar "el problema de node modules", que para no entrar en detalles, podemos resumir con el clásico meme:
+
+
+![Node modules](/node-modules-heaviest.webp)
+
+Típicamente para resolver una dependencia, node busca en `node_modules` por el archivo requerido. Es una operación llamada *resolve*. Los gestores de paquetes tienen que ser compatibles con la lógica de resolución de node. La manera de node es copiar archivos en `node_modules`. Esto lleva tiempo, además `node_modules` se convierte en un directorio muy pesado. 
+
+Yarn 2 propone un sistema alternativo llamado *Plug and Play (PNP)*. Éste reemplaza el comportamiento por defecto de node, por su propia implementación, más optimizada. Yarn 2 almacena cada paquete como un archivo comprimido, en formato .zip, en el directorio `.yarn/cache`. Cuando node requiere un archivo, Yarn 2 intercepta la petición, va a este directorio a por el archivo y lo pasa a node.
+
+Así es capaz de garantizar mayor velocidad y ocupar menos espacio en disco. Además, la cache de Yarn es tan compacta con respecto a `node_modules` que se puede guardar en el repositorio, lo que da al proyecto una gran autonomía: como todo está en la caché, se puede hacer una build sin depender de repositorios externos (npm registry) o incluso sin tener acceso a red.  
+Solo se depende del repositorio de paquetes (npm registry) al añadir o actualizar dependencias.
+
+### La polémica
+Esto, que en el papel suena muy bien, causó mucho rechazo en la comunidad de desarrollo. Veamos porqué:
+
+1. PnP rompe con el status quo. A pesar de ser una idea innovadora y esencialmente buena, obliga a todo el ecosistema a cambiar su forma de trabajar para integrarlo y a realizar un trabajo de migración bastante exigente. Además, su adopción obliga a los autores de Open Source y a las librerías a forzar a su vez a sus usuarios a utilizar este sistema, cuando `npm` es una opción por defecto que funciona sin esfuerzo por parte del usuario. Esa es la razón por la que **muchos autores de Open Source (Kent C. Dodds, Dan Abramov, Jared Palmer) y grandes librerías lo rechazaron (Twitter, Facebook)** y declararon que se mantendrían en la version 1. 
+   
+   Más sobre esto: https://youtu.be/bPae4Z8BFt8?t=194
+   
+   
+2. Con la entrada de Yarn 2, Yarn 1 se convertía en un repositorio legacy. Yarn optó por una estrategia de lanzamiento agresiva, para forzar a la comunidad a introducir PnP. La afirmación de que Yarn 1 era legacy provocó bastante alarma, especialmente cuando buena parte de los usuarios no tenían posibilidad de migrar a Yarn 2.  Los autores tenían la intención de mantenerlo, simplemente arreglando potenciales vulnerabilidades, durante un par de años más para luego archivarlo permanentemente (spoiler, no tiene pinta de que esto vaya a pasar pronto). 
+
+   El cambio de Yarn 1 a Yarn 2 es tan radical, que Yarn 1 recibió el nombre de Yarn Classic y Yarn 2 el de Yarn Berry, para indicar que no existe continuidad entre los proyectos, son cosas distintas. **Yarn 2 y Yarn Berry son términos equivalentes**. Yarn 3 continua el camino iniciado por Yarn 2 y también forma parte de Yarn Berry. 
+   
+   Más sobre esto: https://github.com/yarnpkg/berry/issues/766
+   
+
+A raíz de la polémica, Yarn aclaró que la versión Classic sería la que se instalaría por defecto, y que se podría actualizar por proyecto a la versión 2 con `yarn set version berry`.  Es por eso que en nuestro directorio raíz, si hacemos `yarn -v`, vemos yarn 1.22.x y en nuestros proyectos vemos yarn 3.x.x.
+
+A día de hoy, para poder garantizar la estabilidad del ecosistema y prevenir problemas, Yarn Classic sigue siendo la versión de facto cuando instalas `yarn`. Su feature estrella, PnP, sigue sin estar activada por defecto al actualizar a Yarn Berry. Tenemos que seguir un proceso adicional (que veremos adelante) para usarla. Lo cual da que pensar: ¿cómo apostar por una herramienta por que la ni siquiera sus autores pueden apostar definitivamente?
+
+
+## ¿Dónde estamos nosotros?
+Actualmente en nuestra documentación recomendamos el uso de **Yarn Berry**. Parece que obtenemos [alguna ventaja al comitear la caché de yarn a Github](https://youtu.be/fFpFdD3ExFo). Pero después de todo este tiempo, el directorio de `node_modules` sigue en nuestros proyectos. No usamos PnP, y parece complicado que podamos empezar a hacerlo, porque es conocido que puede presentar incompatibilidades con algunas librerías y representa un proceso de migración que no es trivial.
+
+En nuestros proyectos, cuando hacemos upgrade de Yarn Classic a Yarn Berry, en el archivo `.yarnrc.yarm` se crea una propiedad `nodeLinker` con el valor de `node_modules`. Es la manera que tiene YB de configurar el uso de node modules por defecto. Para usar PnP hay que borrar esa línea y correr el comando `yarn`. 
+
+## ¿Deberíamos intentar adoptar PnP?
+PnP parece realmente eficiente a nivel de performance. Yarn ha estado trabajando desde el lanzamiento para mejorar la compatibilidad, incluso haciendo PR a conocidas librerías para integrar PnP, pero aún parece [presentar problemas](https://www.reddit.com/r/javascript/comments/qfknkk/yarn_31_corepack_esm_pnpm_mode_optional_packages/). 
+
+He leído a usuarios que comentan que han podido hacerlo sin grandes problemas en aplicaciones de tamaño pequeño y medio, pero lo habitual es leer advertencias sobre lo complicada que puede ser la migración. 
+
+### Prueba de migración a PnP
+Para hacerme una idea de cómo sería el proceso, he intentado migrar Baselang a PnP, pero no he sido capaz de completar la migración con éxito. Yarn Berry cuenta con [una guía sospechosamente detallada de migración](https://yarnpkg.com/getting-started/migration), aunque ellos mismos advierten de que puede ser un proceso difícil para proyectos existentes. La idea, no obstante, sería usar PnP en proyectos nuevos. 
+
+**Proceso en lineas generales**:
+- Borré la línea de `nodeLinker` en `.yarnrc.yml` y corrí el comando `yarn`. Con esto ya tenemos PnP y se borra casi todo el contenido de `node_modules`. Además, se generan un par de archivos `.pnp*`, que especifican cómo hacer la resolución de módulos. Es el código que se encarga de seleccionar y extraer los archivos comprimidos en runtime.
+- Lancé `yarn start` y empecé a encontrar problemas de `peer dependencies`. Lo arreglé como indica aquí: https://yarnpkg.com/getting-started/migration#fix-dependencies-with-packageextensions
+- Después de arreglar un par de dependencias de esa manera, encontré un nuevo error al lanzar la aplicación: "Cannot find module `react-focus-trap`". [Según la documentación](https://yarnpkg.com/getting-started/migration#cannot-find-module-) de Yarn esto no es un error de ellos, si no de como está configurado el entorno de node. Lo pude arreglar borrando `.yarnrc.yml` y volviendo a lanzar `yarn`.
+- Además, como la mayoría de editores están hechos para funcionar con `node_modules`, existen incompatibilidades con el IDE, con extensiones como la de Prettier. Para arreglarlo tienes que añadir una dependencia que gestiona la integración. https://yarnpkg.com/getting-started/editor-sdks
+- También tuve que especificar que la versión de Typescript es la del workspace: `Settings > Typescript: Select TS version > use workspace version`
+- En este punto, el IDE empezó a lanzar errores relacionados con `stylelint` y `post css` que no supe solucionar.
+
+Probablemente, lo hubiera conseguido de seguir insistiendo, pero la pregunta es, ¿debería ser tan difícil? Las innovaciones de PnP, de algún modo, constituyen su principal desventaja. En lugar de adecuarse a ti, te obligan a jugar al juego de YB, con sus reglas de configuración y sus particularidades. 
+
+## ¿Qué alternativas tenemos?
+
+En esta situación, se plantean dos opciones.
+
+### 1. Quedarnos como estamos. 
+
+> "Si no está roto no lo rompas".  
+
+Yarn Berry no es mal sistema, pero creo que no podemos plantearnos asumir PnP en el medio plazo, o de hacerlo, tenemos que asumir tantas peculiaridades que nos estamos encerrando en un enfoque que parece ir a contracorriente.
+Podemos seguir usándolo con `node_modules`, como venimos haciendo hasta ahora. La configuración sigue siendo un poco más complicada que con otros gestores, pero es algo que tenemos documentado y solo da problemas puntuales. 
+
+Por otra parte volver a Yarn Classic no tiene demasiado sentido, porque es un proyecto en fase de mantenimiento.
+
+Mi sensación, a pesar de todo, es que el mayor argumento para seguir con Yarn Berry es que ya lo estamos usando.  
+
+### 2. Mirar qué nuevos players existen en la gestión de dependencias
+
+Performant npm, `pnpm`, es un gestor de dependencias cuya primera versión apareció en 2017, y va por su versión 7. En el último par de años se ha popularizado mucho y está ganando una rápida adopción. NextJs, por ejemplo, [está empezando a usarlo](https://github.com/vercel/next.js/pull/37259). 
+
+**¿En qué se diferencia?** Pnpm trabaja con `node modules`. No propone un sistema tan rupturista como Yarn Berry, pero si que cuenta con una gran innovación y es cómo trata ese directorio de `node modules`. Yarn y npm duplican las dependencias cada vez que son requeridas. Es decir, si varios proyectos (o sus respectivas dependencias) usan una versión de una dependencia, se instala una copia por cada proyecto o dependencia. Esto cual aumenta el uso de disco considerablemente. 
+Lo que `pnpm` hace de forma diferente es mantener una carpeta `node modules` con links que apuntan a un store global, por lo tanto solo existe una copia de cada dependencia necesaria. 
+Incluso si los proyectos necesitan diferentes versiones de una misma dependencia, `pnpm` es capaz de saber en qué archivos esas versiones son diferentes y guardar solo los archivos que constituyen la diferencia, optimizando al máximo el espacio en disco.
+
+Aquí se explica ~~en mayor detalle~~ mejor: https://pnpm.io/motivation
+
+Otra característica de seguridad es que `pnpm` nos previene de usar dependencias de nuestras dependencias, lo cual es problemático si más tarde eliminamos la dependencia original o ésta cambia sus dependencias.
+
+Además de las ventajas en almacenamiento de disco, este sistema es muy rápido porque el tiempo de copia de archivos es menor. Es un sistema de de hecho Yarn y npm ya están imitando. 
+
+#### Prueba de migración a pnpm
+He creado una nueva rama en Baselang, para migrar a pnpm, de la misma manera que he hecho con Yarn Berry PnP. Me ha resultado más difícil saber por donde empezar, porque no hay una guía clara de migración. Luego me he dado cuenta de que no era necesaria. Estos son los pasos que he seguido:
+
+- He instalado `pnpm`. La documentación ofrece muchas maneras de hacerlo, yo lo he hecho con `brew`
+- He corrido el comando `pnpm import`, que toma la información de los archivos .lock para crear el archivo `pnp-lock.yml`
+- He borrado los archivos de configuración de yarn y he sustituido las referencias a yarn por referencias a pnpm.
+- He lanzando `pnpm start`. Ha funcionado.
+- He lanzando `pnpm build`. Ha funcionado.
+
+Honestamente, pensaba que me iba a encontrar con muchos errores, especialmente migrando desde Yarn en lugar de desde npm, pero no ha sido así. Por supuesto, serían necesarias más pruebas y actualizar nuestros flujos de CI para que fueran compatibles con pnpm (desconozco si existirán impedimentos mayores ahí).
+
+
+## Yarn 2 vs pnpm
+
+Algunos datos de benchmarking:
+- El soporte de la comunidad es muy diferente entre proyectos. Yarn Berry cuenta con ~6K estrellas en Github, pnpm con ~21K. Como comparativa Yarn Classic tiene ~41K. Además, como sabemos, muchos actores del ecosistema han expresado directamente su rechazo a usar Yarn Berry.
+- Parece que Yarn 2 Berry con PnP es el sistema más rápido. Pero que pnpm es más rápido que Yarn 2 con `node_modules`, que es lo que nosotros usamos. Benchmarking:
+	- De terceros: https://blog.logrocket.com/javascript-package-managers-compared/#performance-disk-space-efficiency
+	- De pnpm:  https://pnpm.io/benchmarks
+	- De Yarn: https://yarnpkg.com/benchmarks
+- A día de hoy, hay ningún gran proyecto que use Yarn Berry con PnP.  https://blog.logrocket.com/javascript-package-managers-compared
+- Aunque `pnpm` se mantiene por debajo en descargas con respecto a Yarn (1 + 2), tiene un volumen de descargas grande y muestra una tendencia rápida de crecimiento. 
+- NextJs ha adoptado pnpm: https://github.com/vercel/next.js/pull/37259
+
+En resumen:
+- Yarn Berry requiere más archivos de configuración, diferentes de lo habitual,  requiere mayor compromiso por su sistema propio. Presenta incompatibilidades para usarlo en toda su capacidad. Su mayor ventaja es que ya lo estamos usando. 
+- Por otra parte, pnpm "just works". Es un nuevo sistema que está ganando rápida adopción, es fácil de instalar y sus competidores están copiando su manera de hacer las cosas.
+
+
+## Propuesta de pasos a seguir
+- Lectura de propuesta por parte del equipo
+	- Revisión con de comentarios a favor/en contra a través de la PR
+- En caso de apostar por `pnmp`, hacer más pruebas y testear CI/CD
+- Test en un proyecto nuevo para validación
+- Actualización de la guía de inicio para recomendar el uso de pnpm
+	- Presentación del cambio en la reunión de front e indicaciones para su adopción
+
+
+## Referencias
+
+- Ben Awad, release of Y2. Explica la polémica en torno a la aparición de Yarn 2 y las dudas sobre su adopción.: https://www.youtube.com/watch?v=bPae4Z8BFt8
+- Yarn Berry: a next generation package manager https://www.youtube.com/watch?v=fFpFdD3ExFo
+- Javascript packages managers compared https://blog.logrocket.com/javascript-package-managers-compared/
+- Yarn 2, Yarn 3, PNP, and our migration journey - Jakub Zitny https://www.youtube.com/watch?v=egu0qvIEnTg
+- Reddit Pnpm vs Yarn 2? https://www.reddit.com/r/learnjavascript/comments/k9i50i/pnpm_vs_yarn_2/
+- Why I Switched From NPM/Yarn to PNPM https://www.youtube.com/watch?v=d1E31WPR70g
+- Why you should prefer PNPM https://refine.dev/blog/pnpm-vs-npm-and-yarn/
+- Yarn Berry state 2021 https://blog.hao.dev/state-of-yarn-2-berry-in-2021
+- Migration from Yarn to pnpm https://divriots.com/blog/switching-to-pnpm
+
+### Documentación
+- Yarn Pnp https://yarnpkg.com/features/pnp
+- Yarn Pnp compatibility table https://yarnpkg.com/features/pnp#compatibility-table
+- Yarn Berry migration https://yarnpkg.com/getting-started/migration
+- Pnpm motivation https://pnpm.io/motivation
+- Pnpm Yearn 2022 https://pnpm.io/blog/2022/12/30/yearly-update
