@@ -1,0 +1,263 @@
+# Manually deploy to Vercel
+
+### ℹ️ Official Docs
+[How can I use GitHub Actions with Vercel?](https://vercel.com/guides/how-can-i-use-github-actions-with-vercel)
+
+## 1. Connect Vercel
+1. If it's not already connected, **connect your repository** in `Vercel > Settings > Git`
+2. **Create an unique personal Vercel Token**. Go to https://vercel.com/account/tokens and click on `Create`. Save the token created
+
+## 2. Secrets
+
+1. Install the [Vercel CLI](https://vercel.com/docs/cli) on your computer if it's not installed yet. Then, execute on your project terminal:
+``` 
+vercel link
+```
+&emsp; Link the project to the repository of your project and a `.vercel` folder will be created at the root of your project
+
+2. In **Github** go to `Settings > Secrets > Actions`.
+  Click on `Add repository secret` and add the following secrets:
+  ```
+  VERCEL_TOKEN: the unique personal token you got from Vercel
+  VERCEL_ORG_ID: from .vercel/project.json
+  VERCEL_PROJECT_ID: from .vercel/project.json
+  ```
+
+3. Go to `Vercel > Environmental` variables en set `CI = true` in all environments
+
+4. Unlink your repository from Vercel in in `Vercel > Settings > Connected Git Repository`
+
+## 3. Add files
+Add the following files in the root of your project
+
+`.env.development`
+```
+// your development environmental variables if there are
+```
+
+`.env.production`
+```
+// your production environmental variables if there are
+```
+
+`vercel.json`
+```json
+{
+  "github": {
+    "silent": false
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "x-robots-tag",
+          "value": "noindex"
+        }
+      ]
+    }
+  ]
+}
+```
+
+`vercel.sh`
+
+```sh
+#!/bin/bash
+
+branch="$VERCEL_GIT_COMMIT_REF"
+CI="true"
+
+if [ "$branch" = "main" ]; then
+  echo "✅ - Build can proceed"
+  echo "Branch: $branch"
+  exit 1
+elif [ "$branch" = "develop" ]; then
+  echo "✅ - Build can proceed"
+  echo "Branch: $branch"
+  cp .env.development .env.production
+  exit 1
+else
+  echo "✅ - Preview Build"
+  echo "Branch: $branch"
+  cp .env.development .env.production
+  exit 1
+fi;
+```
+
+## 4. Config the workflow
+Go to your `cicd.yml` file
+
+First, make sure you specify in which environments you want this workflows to be triggered. An example:
+```yml
+push:
+    branches:
+      - develop
+      - staging
+      - main
+  pull_request:
+    branches:
+      - develop
+      - staging
+      - main
+  workflow_dispatch:
+    branches:
+      - develop
+      - staging
+      - main
+```
+
+Then, add the following workflows (make sure the environments names match your project environment names):
+```yml
+  Deploy-Vercel-Preview:
+    if: ${{ (github.event_name == 'pull_request') && (github.ref != 'refs/heads/staging' || github.ref != 'refs/heads/main' || github.ref != 'refs/heads/develop')}}
+    name: Deploy Vercel Preview
+    runs-on: ubuntu-22.04
+    needs: [Setup, Lint]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn/unplugged
+            .yarn/build-state.yml
+            .yarn/install-state.gz
+            node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ hashFiles('.yarnrc.yml') }}
+
+      - name: Setup Node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies if not cached
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: yarn install --immutable --immutable-cache
+
+      - name: Assign environment file
+        run: cp .env.development .env.production
+
+      - name: Build
+        run: yarn build
+
+      - name: Deploy Step Preview
+        uses: amondnet/vercel-action@v20
+        id: deploy-vercel-preview
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: Preview URL
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Deploy Preview for ${{ steps.deploy-vercel-preview.outputs.preview-name }}
+            | Name | Link |
+            |------|------|
+            |😎 Deploy Previews|${{ steps.deploy-vercel-preview.outputs.preview-url }}|
+
+  Deploy-Vercel-Develop:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    name: Deploy Vercel Develop
+    runs-on: ubuntu-22.04
+    needs: [Setup, Lint]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn/unplugged
+            .yarn/build-state.yml
+            .yarn/install-state.gz
+            node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ hashFiles('.yarnrc.yml') }}
+
+      - name: Setup Node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies if not cached
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile
+
+      - name: Assign environment file
+        run: cp .env.development .env.production
+
+      - name: Build
+        run: yarn build
+
+      - name: Deploy Step Develop
+        uses: amondnet/vercel-action@v20
+        id: deploy-vercel-staging
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+  Deploy-Production:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    name: Deploy Vercel Production
+    runs-on: ubuntu-latest
+    needs: [Setup, Lint]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Cache Dependencies
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            .yarn/unplugged
+            .yarn/build-state.yml
+            .yarn/install-state.gz
+            node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ hashFiles('.yarnrc.yml') }}
+
+      - name: Setup Node 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies if not cached
+        if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: yarn install --immutable --immutable-cache
+
+      - name: Build
+        run: yarn build
+
+      - name: Deploy Step Production
+        uses: amondnet/vercel-action@v20
+        id: deploy-vercel-production
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+```
+
+## 5. Config Vercel project
+
+- **To upload the app:** <br />
+Go to `Vercel > Settings > General > Build & Development Settings`, and set the Framework Preset to `Next.js`
+
+- **To upload Storybook:** <br />
+In your `cicd.ylm` file, change `yarn build` for `yarn build:storybook` (or the script defined to build storybook in your project)
+<br />
+In `Vercel > Settings > General > Build & Development Settings`, and set the Framework Preset to `Other`
+Override the Output Directory and set it to `storybook-static`
