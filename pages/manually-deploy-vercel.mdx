@@ -86,11 +86,31 @@ fi;
 ```
 
 ## 4. Config the workflow
-Go to your `cicd.yml` file and add the following workflows:
+Go to your `cicd.yml` file
 
+First, make sure you specify in which environments you want this workflows to be triggered. An example:
+```yml
+push:
+    branches:
+      - develop
+      - staging
+      - main
+  pull_request:
+    branches:
+      - develop
+      - staging
+      - main
+  workflow_dispatch:
+    branches:
+      - develop
+      - staging
+      - main
+```
+
+Then, add the following workflows (make sure the environments names match your project environment names):
 ```yml
   Deploy-Vercel-Preview:
-    if: ${{ (github.event_name == 'pull_request' || github.event_name == 'push') && (github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop' )}}
+    if: ${{ (github.event_name == 'pull_request') && (github.ref != 'refs/heads/staging' || github.ref != 'refs/heads/main' || github.ref != 'refs/heads/develop')}}
     name: Deploy Vercel Preview
     runs-on: ubuntu-22.04
     needs: [Setup, Lint]
