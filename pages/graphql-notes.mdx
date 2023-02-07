@@ -281,20 +281,20 @@ Para activar el autocompletado, necesitamos crear un archivo de configuración d
 
 De esta manera, tendremos un error si escribimos un campo que no existe en nuestra query, recibiremos sugerencias al escribir y también podemos ver todas los campos disponibles con el shortcut `crtl + space`.
 
-![[graphql-autocomplete-suggestions.png | 400]]
 
-![[graphql-autocomplete-error.png | 500]]
+![Graphql Suggestions](graphql-autocomplete-suggestions.png | width=400)
 
+![Graphql Error](graphql-autocomplete-error.png | width=400)
 
 
 ## FAQ
 
-### **¿Cómo y donde usar los tipos que genera Codegen?**
+### ¿Cómo y donde usar los tipos que genera Codegen?
 
 Podemos usar los tipos de Codegen en nuestros hooks de GraphQL y en nuestras vistas. En cambio, los componentes que viven en la carpeta `/componentes` son componentes presentacionales. Hay que pensar en ellos como piezas atómicas de un sistema, hechas para reusarse y encajar en diferentes contextos, y por tanto, agnósticas de los detalles del dominio de la aplicación. La idea es que deberíamos poder ser capaces de copiarlas y pegarlas en otro proyecto y que funcionasen. Por tanto las interfaces de estos componentes las vamos a tipar manualmente.
 
 
-### **¿Qué pasa con la normalización?**
+### ¿Qué pasa con la normalización?
 
 Cuando creamos un hook que consume una query o mutación, podemos normalizar los datos antes de devolverlos, para que sea más fácil que sean consumidos por nuestras vistas y componentes.  
 
@@ -377,7 +377,7 @@ export const useTeacherCards = () => {
 Todo el proceso de la normalización se facilita mucho cuando seguimos una filosofía de crear queries pequeñas y ad hoc para nuestras visitas, porque así no necesitamos que el resultado de la normalización "encaje" en interfaces de componentes muy dispares entre sí.
 
 
-### **¿Qué pasa con los fragmentos?**
+### ¿Qué pasa con los fragmentos?
 
 Con los fragmentos ha pasado algo parecido que con la normalización, se han convertido en un hábito que se reproduce ciegamente. Cuando debemos usar los fragmentos:
 - **No** para escribir menos cuando los campos se repiten. Si hacemos esto tenemos que tener mucho cuidado, porque empezamos a tirar de fragmentos que a su vez pueden usar fragmentos y es muy fácil caer en el *overfetching* y el las dependencias circulares.
@@ -431,7 +431,7 @@ mutation assignOnlinePlan($input: AssignOnlinePlanInput!) {
 En general es una buena práctica pedir al equipo de backend que las mutaciones devuelvan los tipos que mutan. 
 
  
-### **¿Qué estructura de directorios tienen que seguir nuestros archivos de GraphQL?**
+### ¿Qué estructura de directorios tienen que seguir nuestros archivos de GraphQL?
 
 Actualmente estamos usando una estructura donde todo se agrupa de manera funcional, Por tanto, tenemos todo lo relativo a graphql junto en una carpeta con el mismo nombre. Dentro de esta carpeta tenemos:
 
