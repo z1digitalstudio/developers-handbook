@@ -79,6 +79,7 @@ El plugin `typescript-react-apollo` nos ha servido para generar nuevos tipos que
 Podemos configurar el plugin para usar los tipos en diferentes grados de dependencia.
 
 1. **Con documentos tipados**
+
 Un documento tipado contiene una llamada al esquema (una query, una mutación), usando el template literal `gql`. Es decir genera para nosotros algo muy similar a lo que antes tipábamos a mano. 
 
 Ya no escribimos la query como lo hacíamos en el caso anterior, podemos escribir directamente nuestras operaciones en archivos `.graphql` o `.gql`. Codegen va a interpretarlos y generar a partir de ellos los documentos tipados. En queries, tenemos algo como: 
@@ -113,7 +114,7 @@ const { data } = useQuery<
 >  Projectos de ejemplo: `Dreamlab`, `Baselang`
 
 
-1. **Con documentos tipados y hooks**
+2. **Con documentos tipados y hooks**
 
 Este plugin genera por defecto hooks de Apollo listos para usar. Por ejemplo, a partir de la query anterior, generaría algo como `useGetMeQuery` y `useGetMeLazyQuery`, que podemos usar directamente en los hooks connect de nuestras vistas. Esta configuración puede ser útil para proyectos pequeños donde queramos que prime la agilidad, y reducir el boilerplate que escribimos. A cambio sacrificamos la independencia del frontend, estamos más acoplados a Apollo. 
 
