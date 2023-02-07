@@ -124,14 +124,14 @@ Este plugin genera por defecto hooks de Apollo listos para usar. Por ejemplo, a 
 
 ### Typed document node
 
-[Typed document node](https://the-guild.dev/graphql/codegen/plugins/typescript/typed-document-node)  (TDN) es otro plugin que funciona de manera similar a  Typescript React Apollo, también genera documentos tipados a partir de nuestras queries y mutaciones escritas en `.graphql`. Presenta una ventaja adicional, que es un tipado mucho más sencillo cuando usamos los documentos generados en los hooks de Apollo. 
+[Typed document node](https://the-guild.dev/graphql/codegen/plugins/typescript/typed-document-node)  (TDN) es otro plugin que funciona de manera similar a  Typescript React Apollo, también genera documentos tipados a partir de nuestras queries y mutaciones escritas en `.graphql`. Presenta una ventaja adicional, que es un tipado mucho más sencillo a la hora de usar los tipos generados en los hooks de Apollo. 
 
 - `typescript-apollo-react`
 
 ```ts
 const [
   performCancelAppointment,
-  { loading: cancelAppointmentAppointmentsLoading },
+  { loading },
 ] = useMutation<
   CancelAppointmentMutation,
   CancelAppointmentMutationVariables
@@ -143,13 +143,13 @@ const [
 ```ts
 const [
   performCancelAppointment,
-  { loading: cancelAppointmentAppointmentsLoading },
+  { loading },
 ] = useMutation(CancelAppointmentDocument, {
   refetchQueries: ['GetMyAppointments'],
 });
 ```
 
-Con Typescript React Apollo necesitamos pasar al hook uno o dos tipos genéricos, para que los datos retornados estén tipados correctamente. Con Typed Document Node, no es necesario, y nuestra llamada queda mucho más limpia. 
+Con Typescript React Apollo necesitamos pasar al hook uno o dos tipos genéricos para que los datos retornados estén tipados correctamente. Con Typed Document Node, no es necesario, y nuestra llamada queda mucho más limpia. 
 
 Además, este plugin trae un par de [tipos](https://github.com/dotansimha/graphql-typed-document-node#how-to-use) que nos pueden ser de utilidad: `VariablesOf<typeof MyQueryDocument>` y `ResultOf<typeof MyQueryDocument>`
 
@@ -230,15 +230,17 @@ export default config;
 Vamos a analizar qué tenemos aquí:
 
 - `schema`. Especificamos a partir de qué schemas queremos generar nuestros tipos. Normalmente solo tendremos uno, la api url que nos proporciona backend. Si además queremos trabajar con [client fields](#client-fields) (spoiler: normalmente no lo haremos), podemos especificar un esquema en el lado del cliente.
-- `documents`: Uno o varios *globs* especificando en qué rutas están nuestras queries, mutaciones, fragmentos y suscripciones, que Codegen usará para generar los tipos.
+- `documents`: Uno o varios *globs* especificando en qué rutas están nuestras queries, mutaciones, fragmentos y suscripciones que Codegen usará para generar los tipos.
 - `generates`: Lista con los documentos que queremos generar cada vez que ejecutemos el comando de Codegen. El más importante de los archivos que generamos es `types.ts`.
 	- `types.ts`. Aquí se generan los documentos tipados de los que hablamos anteriormente. Para configurar cómo queremos generar este archivo, tenemos un objeto donde especificamos qué plugins vamos a usar y que configuración va a tener cada plugin. Vemos algunas opciones interesantes como `maybeValue: 'T | undefined'` que quita los nulls de nuestros tipos (algo que antes teníamos que hacer manualmente en el paso de la normalización). Podéis consultar el resto en la documentación:
 		- [Opciones](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript) de configuración de `typescript`
 		- [Opciones](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations) de configuración de `typescript-operations`:
 		- [Opciones](https://the-guild.dev/graphql/codegen/plugins/typescript/typed-document-node) de configuración de `typed-document-node`
+		
 	- `introspection.ts`. El archivo de introspección es un archivo importante pero con el que no vamos a trabajar directamente en el código de nuestra aplicación. Básicamente usamos un plugin adicional, `fragment-matcher` para que Apollo entienda las uniones e interfaces de GraphQL. El archivo generado simplemente lo pasamos al cliente de Apollo cuando lo instanciemos bajo la key `possibleTypes`, y no tenemos que hacer nada más al respecto. Más información: 
 		- https://the-guild.dev/graphql/codegen/plugins/other/fragment-matcher
 		- https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
+
 	- `schema.graphql`. Un tercer archivo que podemos generar es el schema de back en nuestro front. Lo podemos hacer gracias a otro plugin, `schema-ast`. Tener el schema en front nos permite una mejor experiencia de desarrollo (ver [Extensiones](#Extensiones))
 - `hooks`. Por último, de la misma manera que existen hooks para .git que nos permiten realizar acciones en ciertos momentos del ciclo de git, también tenemos [lifecycle hooks](https://the-guild.dev/graphql/codegen/docs/config-reference/lifecycle-hooks) para codegen. En este caso, formateamos con prettier después de generar los archivos. 
 
@@ -267,6 +269,7 @@ En nuestro `package.json`, añadimos un script para correr la linea de comandos 
 Para tener *syntax highlighting* y autocompletado en nuestras operaciones de graphql, podemos instalar las siguientes extensiones (para VSCode):
 - [Graphql: Syntax Highlighting](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql-syntax)
 - [Graphql: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql)
+
 	🚨 Existen dos extensiones con el mismo nombre, instalad la que tiene un mayor número de descargas
 
 Para activar el autocompletado, necesitamos crear un archivo de configuración donde vamos a indicar la ruta del `schema.graphql` que generamos antes con Codegen:
