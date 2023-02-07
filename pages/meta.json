@@ -10,5 +10,6 @@
   "manually-deploy-vercel": "Manually deploy to Vercel",
   "proposals": "Proposals",
   "html-training": "HTML Training",
-  "global-styles": "Global styles"
+  "global-styles": "Global styles",
+  "graphql-notes": "Notas sobre el uso de Graphql en los proyectos"
 }
