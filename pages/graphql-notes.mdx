@@ -239,7 +239,7 @@ Vamos a analizar qué tenemos aquí:
 	- `introspection.ts`. El archivo de introspección es un archivo importante pero con el que no vamos a trabajar directamente en el código de nuestra aplicación. Básicamente usamos un plugin adicional, `fragment-matcher` para que Apollo entienda las uniones e interfaces de GraphQL. El archivo generado simplemente lo pasamos al cliente de Apollo cuando lo instanciemos bajo la key `possibleTypes`, y no tenemos que hacer nada más al respecto. Más información: 
 		- https://the-guild.dev/graphql/codegen/plugins/other/fragment-matcher
 		- https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
-	- `schema.graphql`. Un tercer archivo que podemos general es el schema de back en nuestro front. Lo podemos hacer gracias a otro plugin, `schema-ast`. Tener el schema en front nos permite una mejor experiencia de desarrollo (ver [Extensiones](#Extensiones))
+	- `schema.graphql`. Un tercer archivo que podemos generar es el schema de back en nuestro front. Lo podemos hacer gracias a otro plugin, `schema-ast`. Tener el schema en front nos permite una mejor experiencia de desarrollo (ver [Extensiones](#Extensiones))
 - `hooks`. Por último, de la misma manera que existen hooks para .git que nos permiten realizar acciones en ciertos momentos del ciclo de git, también tenemos [lifecycle hooks](https://the-guild.dev/graphql/codegen/docs/config-reference/lifecycle-hooks) para codegen. En este caso, formateamos con prettier después de generar los archivos. 
 
 ## Otras configuraciones adicionales
