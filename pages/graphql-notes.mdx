@@ -292,7 +292,7 @@ De esta manera, tendremos un error si escribimos un campo que no existe en nuest
 
 ## FAQ
 
-### ¿Cómo y donde usar los tipos que genera Codegen?
+### ¿Cómo y dónde usar los tipos que genera Codegen?
 
 Podemos usar los tipos de Codegen en nuestros hooks de GraphQL y en nuestras vistas. En cambio, los componentes que viven en la carpeta `/componentes` son componentes presentacionales. Hay que pensar en ellos como piezas atómicas de un sistema, hechas para reusarse y encajar en diferentes contextos, y por tanto, agnósticas de los detalles del dominio de la aplicación. La idea es que deberíamos poder ser capaces de copiarlas y pegarlas en otro proyecto y que funcionasen. Por tanto las interfaces de estos componentes las vamos a tipar manualmente.
 
@@ -377,7 +377,7 @@ export const useTeacherCards = () => {
 	};
 ```
 
-Todo el proceso de la normalización se facilita mucho cuando seguimos una filosofía de crear queries pequeñas y ad hoc para nuestras visitas, porque así no necesitamos que el resultado de la normalización "encaje" en interfaces de componentes muy dispares entre sí.
+Todo el proceso de la normalización se facilita mucho cuando seguimos una filosofía de crear queries pequeñas y ad hoc para nuestras vistas, porque así no necesitamos que el resultado de la normalización "encaje" en interfaces de componentes muy dispares entre sí.
 
 
 ### ¿Qué pasa con los fragmentos?
@@ -436,7 +436,7 @@ En general es una buena práctica pedir al equipo de backend que las mutaciones 
  
 ### ¿Qué estructura de directorios tienen que seguir nuestros archivos de GraphQL?
 
-Actualmente estamos usando una estructura donde todo se agrupa de manera funcional, Por tanto, tenemos todo lo relativo a graphql junto en una carpeta con el mismo nombre. Dentro de esta carpeta tenemos:
+Actualmente estamos usando una estructura donde todo se agrupa de manera funcional. Por tanto, tenemos todo lo relativo a graphql junto en una carpeta con el mismo nombre. Dentro de esta carpeta tenemos:
 
 - /graphql
 	- client
