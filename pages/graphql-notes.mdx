@@ -438,31 +438,55 @@ En general es una buena práctica pedir al equipo de backend que las mutaciones 
 
 Actualmente estamos usando una estructura donde todo se agrupa de manera funcional. Por tanto, tenemos todo lo relativo a graphql junto en una carpeta con el mismo nombre. Dentro de esta carpeta tenemos:
 
-- /graphql
-	- client
-	- queries
-	- mutations
-	- fragments
-	- hooks
+```markdown
+
+├── graphql
+    ├── client
+	├── queries
+	├── mutations
+	├── fragments
+	├── hooks
+
+```
+
 
 De momento, esto se mantiene así, aunque es probable que en nuevos proyectos exploremos otras formas de organización más cercanas a la `screaming architecture`, donde todo se agrupa por dominio, de manera que cuando miramos la estructura del proyecto tenemos una idea de qué va la aplicación. 
 
 En ese contexto, podría suceder que nuestras queries y mutaciones estuvieran dentro de una carpeta `features` , y que dentro de cada feature tuviéramos las operaciones de graphql correspondientes dentro de una carpeta `data`. En esa carpeta también tendríamos el custom hook que las consume. 
 
-- /features
-	- /auth
-		- queries
-		- mutations
-		- repository (hook y normalización)
-	- /calendar
-	- /classes
-	- /lessons
+
+```markdown
+
+├── features
+    ├── auth
+    │   ├── queries
+	│   ├── mutations
+	│   ├── repository (hook + normalización)
+	├── calendar
+	├── classes
+	├── lessons
+	├── ...
+
+```
 
 > **¿Por qué no hemos hecho esto todavía?**
 >
 > Una agrupación funcional es "más fácil de entender", en el sentido de que para saber dónde va cada cosa no tienes porqué conocer el dominio de la aplicación. Tiene menor curva de aprendizaje. Por otra parte, en el modelo de agrupación por dominio, las features no tienen porque corresponderse con las vistas, no tienen un reflejo exacto en la UI, y es más difícil saber donde trazar las separaciones.
 > 
 > ¿Te interesa este tema? [Haz una propuesta](https://developers-handbook.vercel.app/proposals/how-to-make-a-new-proposal)
+
+
+**Apostar por la colocación**
+
+Una solución intermedia, más fácil de aplicar, es apostar por una estrategia de colocación de nuestras operaciones de graphql junto con nuestras vistas. La ventaja de la colocación aquí es que ayuda a entender el scope de nuestras operaciones, a crear queries reducidas para mostrar los datos de nuestras vistas, siguiendo la filosofía que promueve GraphQL. 
+
+Cuando tengamos una operación que necesariamente se utilice en múltiples vistas, entonces la podemos colocar en un directorio de más alto nivel, como la carpeta `/graphql` que siempre usamos.
+
+![Graphql Colocation](graphql-colocation.png)
+
+> Proyectos: Este enfoque se ha usado en `Longevity`. 
+
+Al margen de graphql, la colocación (poner las cosas tan cerca de donde son relevantes como podamos) es una estrategia muy útil a la que recurrir siempre que podamos. [Más información](https://kentcdodds.com/blog/colocation)
 
 
 ### Client fields y otras features de Apollo 3
