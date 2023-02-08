@@ -1,0 +1,568 @@
+# Notas sobre el uso de Graphql en los proyectos
+
+---
+- 🇪🇸 Idioma: Español
+- 😸 Autores: Alejandro Páez, Dani Marcano, Fran Naranjo, Ana Menacho, María Simó
+- 🗓️ Creado: 07/02/2023
+
+---
+
+
+## TL;DR
+- Cambiamos la configuración de Codegen. Ahora nos vamos a apoyar en un plugin que se llama `typed-document-node`
+- La configuración de Codegen la vamos a escrbir en .ts, como recomienda la documentación. 
+- Dejamos de escribir las queries en archivos .ts, usaremos archivos .graphql
+- Proponemos el uso de dos extensiones para tener autocompletado en nuestras queries y mutaciones
+- Más otras recomendaciones y tips para integrar GraphQL en nuestros proyectos
+
+
+## ¿Qué es Codegen y cómo lo usamos?
+
+**Graphql Codegen** (en adelante *Codegen*) es una herramienta que utilizamos en los proyectos que nos permite generar tipos a partir del schema de GraphQL que nos proporciona backend.
+
+En los últimos proyectos estamos trabajando con **distintas configuraciones de la herramienta**, para probar qué nos funciona mejor:
+
+#### Con Gql
+
+Durante mucho tiempo, hemos configurado Codegen con los plugins `typescript` y `typescript-operations` para generar un archivo de tipos.  Luego creábamos nuestras queries y mutaciones usando `gql` "a mano" en documentos `.ts`. 
+
+```ts
+import { gql } from '@apollo/client'; 
+import type { TypedDocumentNode } from '@apollo/client';
+import type { MeChannelsQuery, MeChannelsQueryVariables } from 'graphql/generated';
+
+const ME_CHANNELS: TypedDocumentNode<MeChannelsQuery, MeChannelsQueryVariables> = gql`
+query MeChannels($communityId: UUID!) {
+	meChannels(communityId: $communityId) {
+		id
+		name
+	}
+}`;
+
+export default ME_CHANNELS;
+	```
+
+Esta sintaxis es bastante complicada: creamos una constante, tenemos que tiparla con genéricos que importamos, y usar el template literal `gql` para escribir en grapqhl.
+
+Si además queremos hacer uso de un fragmento en la query, debemos importarlo y declararlo al final de la query.
+
+```ts
+import { gql } from '@apollo/client'; 
+import type { TypedDocumentNode } from '@apollo/client';
+import type { MeChannelsQuery, MeChannelsQueryVariables } from 'graphql/generated';
+import AVATAR_FRAGMENT from 'graphql/fragments/Avatar';
+
+const ME_CHANNELS: TypedDocumentNode<MeChannelsQuery, MeChannelsQueryVariables> = gql`
+query MeChannels($communityId: UUID!) {
+	meChannels(communityId: $communityId) {
+		id
+		name
+		avatar {
+			...Avatar
+		}
+	}
+}
+${AVATAR_FRAGMENT}
+`;
+
+export default ME_CHANNELS;
+```
+
+> Proyectos de ejemplo:  `Console`, `Connekt` y muchos otros.
+
+
+
+#### Con Typescript React Apollo
+
+El plugin `typescript-react-apollo` nos ha servido para generar nuevos tipos que nos han permitido usar Apollo más cómodamente. Este plugin genera documentos tipados a partir del esquema, del tipo `MyQueryDocument` así como otras utilidades relacionadas con Apollo como cliente de Graphql.
+
+Podemos configurar el plugin para usar los tipos en diferentes grados de dependencia.
+
+1. **Con documentos tipados**
+
+Un documento tipado contiene una llamada al esquema (una query, una mutación), usando el template literal `gql`. Es decir genera para nosotros algo muy similar a lo que antes tipábamos a mano. 
+
+Ya no escribimos la query como lo hacíamos en el caso anterior, podemos escribir directamente nuestras operaciones en archivos `.graphql` o `.gql`. Codegen va a interpretarlos y generar a partir de ellos los documentos tipados. En queries, tenemos algo como: 
+
+```graphql
+
+query getMe {
+	me {
+		id
+		name
+		avatar {
+			...Avatar
+		}
+	}
+}
+
+```
+
+Para usar un fragmento simplemente, lo escribimos y lo usamos. No necesitamos importar, porque graphql es capaz de encontrarlo. 
+Codegen generará un `GetMeDocument` y tipos relacionados que luego podemos usar directamente en nuestros hooks de Apollo. Los datos que devuelva el hook estarán correctamente tipados. 
+
+
+```ts
+const { data } = useQuery<
+  GetMeQuery,
+  // no es necesario especificar si la query no recibe variables
+  GetMeQueryVariables 
+>(GetMeDocument);
+```
+
+
+>  Projectos de ejemplo: `Dreamlab`, `Baselang`
+
+
+2. **Con documentos tipados y hooks**
+
+Este plugin genera por defecto hooks de Apollo listos para usar. Por ejemplo, a partir de la query anterior, generaría algo como `useGetMeQuery` y `useGetMeLazyQuery`, que podemos usar directamente en los hooks connect de nuestras vistas. Esta configuración puede ser útil para proyectos pequeños donde queramos que prime la agilidad, y reducir el boilerplate que escribimos. A cambio sacrificamos la independencia del frontend, estamos más acoplados a Apollo. 
+
+>  Projectos de ejemplo: `Tipz`, `Pira`
+
+
+
+### Typed document node
+
+[Typed document node](https://the-guild.dev/graphql/codegen/plugins/typescript/typed-document-node)  (TDN) es otro plugin que funciona de manera similar a  Typescript React Apollo, también genera documentos tipados a partir de nuestras queries y mutaciones escritas en `.graphql`. Presenta una ventaja adicional, que es un tipado mucho más sencillo a la hora de usar los tipos generados en los hooks de Apollo. 
+
+- `typescript-apollo-react`
+
+```ts
+const [
+  performCancelAppointment,
+  { loading },
+] = useMutation<
+  CancelAppointmentMutation,
+  CancelAppointmentMutationVariables
+>(CancelAppointmentDocument, { refetchQueries: ['GetMyAppointments'] });
+```
+
+- `typed-document-node`
+
+```ts
+const [
+  performCancelAppointment,
+  { loading },
+] = useMutation(CancelAppointmentDocument, {
+  refetchQueries: ['GetMyAppointments'],
+});
+```
+
+Con Typescript React Apollo necesitamos pasar al hook uno o dos tipos genéricos para que los datos retornados estén tipados correctamente. Con Typed Document Node, no es necesario, y nuestra llamada queda mucho más limpia. 
+
+Además, este plugin trae un par de [tipos](https://github.com/dotansimha/graphql-typed-document-node#how-to-use) que nos pueden ser de utilidad: `VariablesOf<typeof MyQueryDocument>` y `ResultOf<typeof MyQueryDocument>`
+
+> Projectos de ejemplo: `Longevity`
+
+> [Guía de Graphql Codegen sobre este plugin ](https://the-guild.dev/blog/typed-document-node)
+
+
+### Client Preset
+
+Existen otras opciones en el horizonte. Parece de los mantainers de GraphQL Codegen están empezando a apuntar el uso de otro tipo de configuración: `client-preset`, que van a priorizar en su roadmap y que usa, entre otras cosas, TDN por debajo. De hecho, es la configuración que están recomendando en [su guía de inicio de React](https://the-guild.dev/graphql/codegen/docs/guides/react-vue). Si visitas [el repo de TDN](https://github.com/dotansimha/graphql-typed-document-node#how-to-use) también te redirigen a esta opción.
+
+Aún no lo hemos probado en ningún proyecto, y parece que el cambio de un tipo de configuración a otra no es trivial y afecta a la estructura de archivos, a la forma cómo se escriben las operaciones, etc. Es una propuesta reciente, con lo cual no hay ninguna prisa para adoptarla, pero está bien saber que existe y podríamos considerarla para algún proyecto:
+
+Más información:
+- [Issue Graphql Codegen Roadmap](https://github.com/dotansimha/graphql-code-generator/issues/8296)
+
+
+
+## Configuración de Codegen
+
+El plugin que vamos a usar de manera estable a partir de ahora en nuestros proyectos va a ser el de **Typed Document Node**. Necesitamos instalar las siguientes dependencias: 
+
+```bash
+@graphql-codegen/cli @graphql-codegen/typescript @graphql-codegen/typescript-operations @graphql-codegen/typed-document-node 
+```
+
+En cuanto a nuestro archivo de Configuración, sugiero que **nos movamos de la extensión `.yml` a la `.ts`** que también permite Codegen y actualmente recomienda en su documentación. Los archivos Yaml son más tendentes a error, mientras que un archivo de Typescript es más reconocible y fácil de leer, y tiene opciones de autocompletado. Nuestra configuración quedaría más o menos así:
+
+```ts
+// codegen.ts
+
+import type { CodegenConfig } from '@graphql-codegen/cli';
+
+const config: CodegenConfig = {
+	schema: [
+		`${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? ''}`,
+		'schema.client.graphql/',
+	],
+	documents: ['src/graphql/**/*.graphql'],
+	generates: {
+		'./src/graphql/generated/types.ts': {
+			plugins: [
+				'typescript',
+				'typescript-operations',
+				'typed-document-node',
+			],
+			config: {
+				scalars: {
+					Date: 'string',
+					DateTime: 'string',
+					GenericScalar: 'unknown',
+					Upload: 'unknown',
+					UUID: 'string',
+					Decimal: 'number',
+					JSONString: 'string',
+				},
+				strictScalars: true,
+				skipTypename: true,
+				maybeValue: 'T | undefined',
+			},
+		},
+		'./src/graphql/generated/introspection.ts': {
+			plugins: ['fragment-matcher'],
+		},
+		'./src/graphql/generated/schema.graphql': {
+			plugins: ['schema-ast'],
+		},
+	},
+	hooks: {
+		afterAllFileWrite: 'prettier --write',
+	},
+};
+
+export default config;
+```
+
+Vamos a analizar qué tenemos aquí:
+
+- `schema`. Especificamos a partir de qué schemas queremos generar nuestros tipos. Normalmente solo tendremos uno, la api url que nos proporciona backend. Si además queremos trabajar con [client fields](#client-fields) (spoiler: normalmente no lo haremos), podemos especificar un esquema en el lado del cliente.
+- `documents`: Uno o varios *globs* especificando en qué rutas están nuestras queries, mutaciones, fragmentos y suscripciones que Codegen usará para generar los tipos.
+- `generates`: Lista con los documentos que queremos generar cada vez que ejecutemos el comando de Codegen. El más importante de los archivos que generamos es `types.ts`.
+	- `types.ts`. Aquí se generan los documentos tipados de los que hablamos anteriormente. Para configurar cómo queremos generar este archivo, tenemos un objeto donde especificamos qué plugins vamos a usar y que configuración va a tener cada plugin. Vemos algunas opciones interesantes como `maybeValue: 'T | undefined'` que quita los nulls de nuestros tipos (algo que antes teníamos que hacer manualmente en el paso de la normalización). Podéis consultar el resto en la documentación:
+		- [Opciones](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript) de configuración de `typescript`
+		- [Opciones](https://the-guild.dev/graphql/codegen/plugins/typescript/typescript-operations) de configuración de `typescript-operations`:
+		- [Opciones](https://the-guild.dev/graphql/codegen/plugins/typescript/typed-document-node) de configuración de `typed-document-node`
+		
+	- `introspection.ts`. El archivo de introspección es un archivo importante pero con el que no vamos a trabajar directamente en el código de nuestra aplicación. Básicamente usamos un plugin adicional, `fragment-matcher` para que Apollo entienda las uniones e interfaces de GraphQL. El archivo generado simplemente lo pasamos al cliente de Apollo cuando lo instanciemos bajo la key `possibleTypes`, y no tenemos que hacer nada más al respecto. Más información: 
+		- https://the-guild.dev/graphql/codegen/plugins/other/fragment-matcher
+		- https://www.apollographql.com/docs/react/data/fragments/#using-fragments-with-unions-and-interfaces
+
+	- `schema.graphql`. Un tercer archivo que podemos generar es el schema de back en nuestro front. Lo podemos hacer gracias a otro plugin, `schema-ast`. Tener el schema en front nos permite una mejor experiencia de desarrollo (ver [Extensiones](#Extensiones))
+- `hooks`. Por último, de la misma manera que existen hooks para .git que nos permiten realizar acciones en ciertos momentos del ciclo de git, también tenemos [lifecycle hooks](https://the-guild.dev/graphql/codegen/docs/config-reference/lifecycle-hooks) para codegen. En este caso, formateamos con prettier después de generar los archivos. 
+
+## Otras configuraciones adicionales
+
+Además del archivo `codegen.ts`, necesitamos configurar otro par de aspectos:
+
+### Scripts
+
+En nuestro `package.json`, añadimos un script para correr la linea de comandos de Codegen y generar todos los archivos que especificamos en el archivo de configuración:
+
+```json
+
+"scripts": {
+	"gen": "dotenv -c development -- graphql-codegen",
+	"gen:watch": "yarn gen -- --watch"
+}
+
+```
+
+- Necesitamos `dotenv` como dependencia para poder usar las variables de entorno de nuestro .env en el archivo de configuración de Codegen.
+- También podemos crear un script con el *watch mode* activado, y tenerlo corriendo en un segundo plano mientras desarrollamos. De esta manera no tenemos que ejecutar el comando cada vez que queramos actualizar nuestros tipos. 
+
+### Extensiones
+
+Para tener *syntax highlighting* y autocompletado en nuestras operaciones de graphql, podemos instalar las siguientes extensiones (para VSCode):
+- [Graphql: Syntax Highlighting](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql-syntax)
+- [Graphql: Language Feature Support](https://marketplace.visualstudio.com/items?itemName=GraphQL.vscode-graphql)
+
+	🚨 Existen dos extensiones con el mismo nombre, instalad la que tiene un mayor número de descargas
+
+Para activar el autocompletado, necesitamos crear un archivo de configuración donde vamos a indicar la ruta del `schema.graphql` que generamos antes con Codegen:
+
+```json
+// .graphqlconfig
+
+{
+	"schemaPath": "./src/graphql/generated/schema.graphql"
+}
+```
+
+De esta manera, tendremos un error si escribimos un campo que no existe en nuestra query, recibiremos sugerencias al escribir y también podemos ver todas los campos disponibles con el shortcut `crtl + space`.
+
+
+![Graphql Suggestions](graphql-autocomplete-suggestions.png)
+
+![Graphql Error](graphql-autocomplete-error.png)
+
+
+## FAQ
+
+### ¿Cómo y dónde usar los tipos que genera Codegen?
+
+Podemos usar los tipos de Codegen en nuestros hooks de GraphQL y en nuestras vistas. En cambio, los componentes que viven en la carpeta `/componentes` son componentes presentacionales. Hay que pensar en ellos como piezas atómicas de un sistema, hechas para reusarse y encajar en diferentes contextos, y por tanto, agnósticas de los detalles del dominio de la aplicación. La idea es que deberíamos poder ser capaces de copiarlas y pegarlas en otro proyecto y que funcionasen. Por tanto las interfaces de estos componentes las vamos a tipar manualmente.
+
+
+### ¿Qué pasa con la normalización?
+
+Cuando creamos un hook que consume una query o mutación, podemos normalizar los datos antes de devolverlos, para que sea más fácil que sean consumidos por nuestras vistas y componentes.  
+
+Pero vamos a dejar de hacerlo como [cargo cult](https://en.wikipedia.org/wiki/Cargo_cult_programming?useskin=vector):  es decir, como un boilerplate que añadimos en cada uno de nuestros hooks de Graphql porque *lo hacemos siempre así*, aunque no sepamos muy bien cuál es su propósito.
+
+Ejemplo donde tiene sentido una normalización: 
+- Cuando necesitamos:
+	- Computar nuevos campos
+	- Hacer cálculos con nuestros datos porque siempre los vamos a consumir así
+	- Renombrar campos para que se ajusten a las interfaces que tenemos en front
+
+```ts
+  
+export const useTeacherCards = () => {
+	const { data, loading, fetchMore } = useQuery(GetTeacherCardsDocument);
+
+	const normalizeTeacher = ({
+		avatar,
+		country,
+		name: fullName,
+		currentRating,
+		dele,
+		realWorld,
+		interests,
+	}) => ({
+		avatar: {
+			url: avatar,
+			flag: country?.image,
+			country: country?.nationality,
+		},
+		name: capitalizeAll(fullName),
+		rating: currentRating,
+		programs: getPrograms({ dele, realWorld }),
+		tags: [
+			...interests.map(({ name }) => name),
+		].filter(isString).map(capitalize),
+	}),
+
+	const teacherList = data?.teachers.edges.map(normalizeTeacher)
+	
+	return {
+		teachers: {
+			edges: teacherList,
+			pageInfo: data?.teachers.pageInfo,
+		},
+	};
+```
+
+Ejemplo donde tiene menos sentido una normalización: 
+- Cogemos todos los campos del resultado de una query y los pasamos por una función normalizadora que no hace nada. A lo sumo pasa valores por defecto (cuidado con esto porque podemos enmascarar los tipos reales de nuestros datos de una forma no deseada): 
+
+```ts
+  
+export const useTeacherCards = () => {
+	const { data, loading, fetchMore } = useQuery(GetTeacherCardsDocument);
+
+	const normalizeTeacher = ({
+		avatar,
+		country,
+		name: fullName,
+		currentRating,
+		interests,
+	}) => ({
+		avatar: avatar ?? "",
+		name: name ?? "",
+		currentRating: currentRating ?? 0,
+		interests: interests ?? []
+	}),
+
+	const teacherList = data?.teachers.edges.map(normalizeTeacher)
+	
+	return {
+		teachers: {
+			edges: teacherList,
+			pageInfo: data?.teachers.pageInfo,
+		},
+	};
+```
+
+Todo el proceso de la normalización se facilita mucho cuando seguimos una filosofía de crear queries pequeñas y ad hoc para nuestras vistas, porque así no necesitamos que el resultado de la normalización "encaje" en interfaces de componentes muy dispares entre sí.
+
+
+### ¿Qué pasa con los fragmentos?
+
+Con los fragmentos ha pasado algo parecido que con la normalización, se han convertido en un hábito que se reproduce ciegamente. Cuando debemos usar los fragmentos:
+- **No** para escribir menos cuando los campos se repiten. Si usamos esta estrategia de manera abusiva es muy fácil caer en el *overfetching* y el las dependencias circulares, porque empezamos a tirar de fragmentos que a su vez pueden usar fragmentos, y así sucesivamente y perdemos el control sobre qué datos están requiriendo nuestras queries.
+- **Sí** para **hacer explícita** la relación entre dos operaciones:
+
+Ejemplo de uso de fragmento:
+
+```gql
+fragment StudentState on UserType {
+	student {
+		id
+		currentProgram
+		currentSubscription {
+			id
+			plan {
+				id
+				product
+			}
+		}
+	}
+}
+```
+
+El fragmento se usa, por ejemplo, en la query `me`:
+
+```
+query getMe {
+	me {
+		id
+		email
+		...StudentState
+	}
+}
+```
+
+Pero también como resultado de las mutaciones de `login` , `refresh` o de `assignPlan`.  Queremos que la query `getMe` como estas mutaciones devuelvan los mismos datos, y lo hacemos evidente mediante el uso de un fragmento. 
+
+¿Por qué queremos que devuelvan los mismos datos? Porque, de esta manera, Apollo sabrá que debe actualizar las entradas de la caché relativas a `me` después de realizar estas mutaciones, y tendremos una actualización de la caché automática. [Más información](https://www.apollographql.com/docs/react/data/mutations/#include-modified-objects-in-mutation-responses)
+
+```
+mutation assignOnlinePlan($input: AssignOnlinePlanInput!) {
+	assignOnlinePlan(input: $input) {
+		refreshToken
+		token
+		user {
+			id
+			...StudentState
+		}
+	}
+}
+```
+
+En general es una buena práctica pedir al equipo de backend que las mutaciones devuelvan los tipos que mutan. 
+
+ 
+### ¿Qué estructura de directorios tienen que seguir nuestros archivos de GraphQL?
+
+Actualmente estamos usando una estructura donde todo se agrupa de manera funcional. Por tanto, tenemos todo lo relativo a graphql junto en una carpeta con el mismo nombre. Dentro de esta carpeta tenemos:
+
+```markdown
+
+├── graphql
+    ├── client
+	├── queries
+	├── mutations
+	├── fragments
+	├── hooks
+
+```
+
+
+De momento, esto se mantiene así, aunque es probable que en nuevos proyectos exploremos otras formas de organización más cercanas a la `screaming architecture`, donde todo se agrupa por dominio, de manera que cuando miramos la estructura del proyecto tenemos una idea de qué va la aplicación. 
+
+En ese contexto, podría suceder que nuestras queries y mutaciones estuvieran dentro de una carpeta `features` , y que dentro de cada feature tuviéramos las operaciones de graphql correspondientes dentro de una carpeta `data`. En esa carpeta también tendríamos el custom hook que las consume. 
+
+
+```markdown
+
+├── features
+    ├── auth
+    │   ├── queries
+	│   ├── mutations
+	│   ├── repository (hook + normalización)
+	├── calendar
+	├── classes
+	├── lessons
+	├── ...
+
+```
+
+> **¿Por qué no hemos hecho esto todavía?**
+>
+> Una agrupación funcional es "más fácil de entender", en el sentido de que para saber dónde va cada cosa no tienes porqué conocer el dominio de la aplicación. Tiene menor curva de aprendizaje. Por otra parte, en el modelo de agrupación por dominio, las features no tienen porque corresponderse con las vistas, no tienen un reflejo exacto en la UI, y es más difícil saber donde trazar las separaciones.
+> 
+> ¿Te interesa este tema? [Haz una propuesta](https://developers-handbook.vercel.app/proposals/how-to-make-a-new-proposal)
+
+
+**Apostar por la colocación**
+
+Una solución intermedia, más fácil de aplicar, es apostar por una estrategia de colocación de nuestras operaciones de graphql junto con nuestras vistas. La ventaja de la colocación aquí es que ayuda a entender el scope de nuestras operaciones, a crear queries reducidas para mostrar los datos de nuestras vistas, siguiendo la filosofía que promueve GraphQL. 
+
+Cuando tengamos una operación que necesariamente se utilice en múltiples vistas, entonces la podemos colocar en un directorio de más alto nivel, como la carpeta `/graphql` que siempre usamos.
+
+![Graphql Colocation](graphql-colocation.png)
+
+> Proyectos: Este enfoque se ha usado en `Longevity`. 
+
+Al margen de graphql, la colocación (poner las cosas tan cerca de donde son relevantes como podamos) es una estrategia muy útil a la que recurrir siempre que podamos. [Más información](https://kentcdodds.com/blog/colocation)
+
+
+### Client fields y otras features de Apollo 3
+
+**Client fields**
+En el apartado de configuración de Codegen mencionábamos de pasada los client-fields. Los client fields son campos que añadimos a nuestras queries pero que no existen en el schema de backend, solo en el front. 
+
+Son otra forma de crear estado local, con la ventaja de que todo pasa por el sistema de Apollo: no tenemos que calcular estos campos a partir de los datos que nos devuelve la query en nuestro hook de Graphql. Directamente podemos pedir  a una query un campo calculado que no existe en el servidor, y recibir resultados. 
+
+Para definir un client field, usamos la directiva @client:
+
+```gql
+
+query getMe {
+	me {
+		firstName
+		lastName
+		initials @client
+	}
+}
+
+```
+
+[Más información](https://www.apollographql.com/docs/react/local-state/managing-state-with-field-policies/).
+
+**Field policies**
+Para resolver el campo `initials` de la query anterior necesitaremos definir una *field policy*. Es la manera en la que indicamos a Apollo qué es `initials` y cómo calcularlo. Dentro de la caché de Apollo, definimos este nuevo campo y lo resolvemos:
+
+```ts
+const cache = new InMemoryCache({
+  typePolicies: {
+    UserType: {
+      fields: { 
+	     initials(_, { readField }) {
+			const firstName = readField<string>('firstName') ?? '';
+			const lastName = readField<string>('lastName') ?? '';
+			return getInitials(firstName, lastName);
+			},
+	     }
+	    }
+	  }
+});
+```
+
+**Configuración extra** 
+
+Para configurar el uso de client fields en tu proyecto, debes añadir la configuración correspondiente a Codegen, para que esté al tanto de esta funcionalidad. 
+
+Necesitamos crear un esquema en el lado del cliente, donde habilitamos la directiva @client y especificamos los campos que queremos añadir a cada uno de nuestros tipos. 
+
+```
+directive @client on FIELD
+
+type UserType {
+	initials: String!
+}
+
+```
+
+En el campo de `schema` del archivo de configuración de Codegen, añadimos el path a este esquema, que Codegen tendrá en cuenta en la generación de archivos. 
+
+```
+schema: [
+  `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? ''}`,
+  'schema.client.graphql',
+],
+```
+
+
+> Proyectos: Este enfoque se ha usado en `Pira`. 
+
+
+Las field policies de Apollo 3 son muy potentes y permiten crear estrategias de paginación, personalizar cómo se guardan las entradas en la caché de Apollo, etc. Links por si quieres investigar más:
+
+- Intro to Apollo Client 3.0. https://www.youtube.com/watch?v=ou0fEW1eRjc
+- Fine tunning Apollo Client cache https://www.youtube.com/watch?v=n_j8QckQN5I
+- Customizing the behavior of cached fields: https://www.apollographql.com/docs/react/caching/cache-field-behavior/
