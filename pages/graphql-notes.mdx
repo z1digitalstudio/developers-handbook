@@ -507,7 +507,33 @@ const cache = new InMemoryCache({
 });
 ```
 
+**Configuración extra** 
+
+Para configurar el uso de client fields en tu proyecto, debes añadir la configuración correspondiente a Codegen, para que esté al tanto de esta funcionalidad. 
+
+Necesitamos crear un esquema en el lado del cliente, donde habilitamos la directiva @client y especificamos los campos que queremos añadir a cada uno de nuestros tipos. 
+
+```
+directive @client on FIELD
+
+type UserType {
+	initials: String!
+}
+
+```
+
+En el campo de `schema` del archivo de configuración de Codegen, añadimos el path a este esquema, que Codegen tendrá en cuenta en la generación de archivos. 
+
+```
+schema: [
+  `${process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT ?? ''}`,
+  'schema.client.graphql',
+],
+```
+
+
 > Proyectos: Este enfoque se ha usado en `Pira`. 
+
 
 Las field policies de Apollo 3 son muy potentes y permiten crear estrategias de paginación, personalizar cómo se guardan las entradas en la caché de Apollo, etc. Links por si quieres investigar más:
 
