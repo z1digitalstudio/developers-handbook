@@ -25,8 +25,6 @@ export default {
       <meta name="apple-mobile-web-app-title" content="Z1 Developers Handbook" />
     </>
   ),
-    prevLinks: true,
-    nextLinks: true,
     footer: {
       text: <span>
         {new Date().getFullYear()} © Z1 digital studio
