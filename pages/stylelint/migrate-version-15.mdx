@@ -1,0 +1,172 @@
+# Migrate v14 to v15
+
+Para actualizar la versión de Stylelint de la 14 a la 15, hay algunos cambios que deben tenerse en cuenta a la hora de seguir la guia [How to config Stylelint](/stylelint "How to config Stylelint")
+
+1. En primer lugar, la configuración ya no se realiza directamente en module.exports, sino que se debe utilizar overrides y especificar a qué archivos afecta:
+
+    * Versión 14:
+    ```js
+    module.exports = {
+      customSyntax: '@stylelint/postcss-css-in-js',
+      extends: ['stylelint-config-recommended', 'stylelint-a11y/recommended'],
+      plugins: [
+        'stylelint-a11y',
+        'stylelint-order',
+        'stylelint-config-rational-order/plugin',
+      ],
+      rules: {
+        'order/properties-order': [],
+        'plugin/rational-order': [
+          true,
+          {
+            'border-in-box-model': false,
+            'empty-line-between-groups': false,
+          },
+        ],
+        'unit-disallowed-list': [
+          ['px'],
+          {
+            ignoreProperties: {
+              px: ['/^border/', 'box-shadow', 'clip'],
+            },
+            severity: 'warning',
+          },
+        ],
+        'function-no-unknown': null,
+        /* Styled components conditional blocks are not supported in css in js stylelint's implementation, and it throws false positives */
+        'no-duplicate-selectors': null,
+        'no-empty-source': null,
+        'no-descending-specificity': null,
+      },
+    };
+    ```
+
+    * Versión 15:
+    ```js
+    module.exports = {
+      overrides: [{
+          [...],
+          extends: ['stylelint-config-recommended', 'stylelint-a11y/recommended'],
+          plugins: [
+            'stylelint-a11y',
+            'stylelint-order',
+            'stylelint-config-rational-order/plugin',
+          ],
+          rules: {
+            'order/properties-order': [],
+            'plugin/rational-order': [
+              true,
+              {
+                'border-in-box-model': false,
+                'empty-line-between-groups': false,
+              },
+            ],
+            'unit-disallowed-list': [
+              ['px'],
+              {
+                ignoreProperties: {
+                  px: ['/^border/', 'box-shadow', 'clip'],
+                },
+                severity: 'warning',
+              },
+            ],
+            'function-no-unknown': null,
+            /* Styled components conditional blocks are not supported in css in js stylelint's implementation, and it throws false positives */
+            'no-duplicate-selectors': null,
+            'no-empty-source': null,
+            'no-descending-specificity': null,
+          },
+      }]
+    };
+    ```
+
+
+2. La libreria `@stylelint/postcss-css-in-js` para `customSyntax` esta deprecated, ahora se utiliza `postcss-styled-syntax`:
+
+```js
+module.exports = {
+  overrides: [{
+      [...],
+      extends: ['stylelint-config-recommended', 'stylelint-a11y/recommended'],
+      customSyntax: 'postcss-styled-syntax',
+      plugins: [
+        'stylelint-a11y',
+        'stylelint-order',
+        'stylelint-config-rational-order/plugin',
+      ],
+      rules: {
+        'order/properties-order': [],
+        'plugin/rational-order': [
+          true,
+          {
+            'border-in-box-model': false,
+            'empty-line-between-groups': false,
+          },
+        ],
+        'unit-disallowed-list': [
+          ['px'],
+          {
+            ignoreProperties: {
+              px: ['/^border/', 'box-shadow', 'clip'],
+            },
+            severity: 'warning',
+          },
+        ],
+        'function-no-unknown': null,
+        /* Styled components conditional blocks are not supported in css in js stylelint's implementation, and it throws false positives */
+        'no-duplicate-selectors': null,
+        'no-empty-source': null,
+        'no-descending-specificity': null,
+      },
+  }]
+
+};
+```
+
+
+
+
+3. Por último, hay que decir a qué archivos afecta con el objeto `files`, ar archivo quedaría:
+
+```js
+module.exports = {
+  overrides: [{
+      files: ['./src/**/styles.{ts,tsx}'],
+      customSyntax: 'postcss-styled-syntax',
+      extends: ['stylelint-config-recommended', 'stylelint-a11y/recommended'],
+      plugins: [
+        'stylelint-a11y',
+        'stylelint-order',
+        'stylelint-config-rational-order/plugin',
+      ],
+      rules: {
+        'order/properties-order': [],
+        'plugin/rational-order': [
+          true,
+          {
+            'border-in-box-model': false,
+            'empty-line-between-groups': false,
+          },
+        ],
+        'unit-disallowed-list': [
+          ['px'],
+          {
+            ignoreProperties: {
+              px: ['/^border/', 'box-shadow', 'clip'],
+            },
+            severity: 'warning',
+          },
+        ],
+        'function-no-unknown': null,
+        /* Styled components conditional blocks are not supported in css in js stylelint's implementation, and it throws false positives */
+        'no-duplicate-selectors': null,
+        'no-empty-source': null,
+        'no-descending-specificity': null,
+      },
+  }]
+
+};
+```
+
+
+
