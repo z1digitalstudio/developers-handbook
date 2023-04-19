@@ -12,5 +12,6 @@
   "html-training": "HTML Training",
   "global-styles": "Global styles",
   "graphql-notes": "Notas sobre el uso de Graphql en los proyectos",
-  "setup-slack-notifier": "Cómo conectar Slack y Github"
+  "setup-slack-notifier": "Cómo conectar Slack y Github",
+  "stylelint": "Stylelint"
 }
