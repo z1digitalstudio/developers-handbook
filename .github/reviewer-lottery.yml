@@ -1,0 +1,7 @@
+groups:
+  - name: devs
+    reviewers: 2
+    usernames: 
+      - AnaMMenacho
+      - f-naranjo
+      - mariasimo
