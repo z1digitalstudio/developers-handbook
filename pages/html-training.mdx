@@ -213,11 +213,17 @@ As links if a button doesn't have text we need to add it with `aria-label` or vi
 
 ### Unordered list
 
-<ul>
-  <li>Item</li>
-  <li>Item</li>
-  <li>Item</li>
-</ul>
+export const UnorderedList = () => {
+  return (
+    <ul>
+      <li>Item</li>
+      <li>Item</li>
+      <li>Item</li>
+    </ul>
+  );
+};
+
+<UnorderedList />
 
 ```html
 <ul>
@@ -229,11 +235,17 @@ As links if a button doesn't have text we need to add it with `aria-label` or vi
 
 ### Ordered list
 
-<ol>
-  <li>A</li>
-  <li>B</li>
-  <li>C</li>
-</ol>
+export const OrderedList = () => {
+  return (
+    <ol>
+      <li>A</li>
+      <li>B</li>
+      <li>C</li>
+    </ol>
+  );
+};
+
+<OrderedList />
 
 ```html
 <ol>
@@ -245,11 +257,17 @@ As links if a button doesn't have text we need to add it with `aria-label` or vi
 
 ### Reversed ordered list
 
-<ol reversed>
-  <li>C</li>
-  <li>B</li>
-  <li>A</li>
-</ol>
+export const ReversedOrderedList = () => {
+  return (
+    <ol reversed>
+      <li>C</li>
+      <li>B</li>
+      <li>A</li>
+    </ol>
+  );
+};
+
+<ReversedOrderedList />
 
 ```html
 <ol reversed>
@@ -304,27 +322,33 @@ export const ListWithoutBullets = () => {
 
 We can nest a list inside another and we can have multiple lists nested. The correct markup will be always do it inside a `li`, because only `li` can be direct child of `ul` and `ol`. For example we shouldn't use `div` to group the list items, that would break the semantic structure.
 
-<ul>
-  <li>Item</li>
-  <li>Item</li>
-  <li>
-    <p>Item list</p>
+export const NestedLists = () => {
+  return (
     <ul>
       <li>Item</li>
       <li>Item</li>
       <li>
         <p>Item list</p>
-        <ol>
+        <ul>
           <li>Item</li>
           <li>Item</li>
+          <li>
+            <p>Item list</p>
+            <ol>
+              <li>Item</li>
+              <li>Item</li>
+              <li>Item</li>
+            </ol>
+          </li>
           <li>Item</li>
-        </ol>
+        </ul>
       </li>
       <li>Item</li>
     </ul>
-  </li>
-  <li>Item</li>
-</ul>
+  );
+};
+
+<NestedLists />
 
 ```html
 <ul>
