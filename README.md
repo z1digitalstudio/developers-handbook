@@ -1,7 +1,6 @@
 # Z1 Developers Handbook
 
-![Cover for Z1 Developers Handbook - Our source of shared knowledge and opinions on syntax, conventions and best practicies](/cover.png)
-
+![Cover for Z1 Developers Handbook - Our source of shared knowledge and opinions on syntax, conventions and best practicies](/public/cover.png)
 
 ## Introduction
 
