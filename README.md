@@ -5,7 +5,7 @@
 
 ## Introduction
 
-Welcome! This site includes relevant information, opinionated articles & guides for syntax, conventions, best practices and technical decisions for teams by [@z1digitalstudio](//twitter.com/z1digitalstudio). These content is based on our development experience [building more than 150 products](https://z1.digital/work) in the last 8 years.
+Welcome! This site includes relevant information, opinionated guidelines and tips for syntax, conventions, best practices and technical decisions for teams by [@z1digitalstudio](//twitter.com/z1digitalstudio). These content is based on our development experience [building more than 150 products](https://z1.digital/work) in the last 8 years.
 
 **If you are a client or you are interested in working with us**  
 As developers, we understand that your technical team need more than a [portfolio](https://z1.digital/work) for being sure that we are the best option.
