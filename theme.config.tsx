@@ -5,7 +5,7 @@ export default {
     link: 'https://github.com/z1digitalstudio/developers-handbook',
   },
     docsRepositoryBase: 'https://github.com/z1digitalstudio/developers-handbook/blob/master',
-    logo: <span className="mr-2 font-extrabold hidden md:inline"><img src="/logo.png" alt="Z1 Logo"/>Z1 Developers Handbook</span>,
+    logo: <span className="mr-2 font-extrabold hidden md:inline"><img src="/logo.svg" alt="Z1 Logo"/>Z1 Developers Handbook</span>,
     useNextSeoProps() {
       const { asPath } = useRouter()
       if (asPath !== '/') {
