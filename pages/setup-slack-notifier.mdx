@@ -1,0 +1,56 @@
+# Cómo conectar Slack y Github
+
+---
+- 🇪🇸 Idioma: Español
+- 😸 Autores: María Simó
+- 🗓️ Creado: 23/02/2023
+
+---
+
+
+## TL;DR
+- Instrucciones para conectar Slack y Github a través de una Github Action
+- Recibe notificaciones en un canal de Slack cada vez que se abre y se cierra una PR
+
+
+## Workflow
+
+Copia este archivo en la carpeta de tu proyecto: `.github/workflows/slack-notifier.yml`
+
+```yaml
+name: SlackNotifier
+concurrency:
+	group: PR-${{ github.head_ref }}
+	cancel-in-progress: true
+on:
+	pull_request:
+		branches:
+			- main
+jobs:
+	Notify:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: frannpr/pr_open_slack@v0.0.30
+			with:
+				CHANNEL_ID: ${{ secrets.CHANNEL_ID}}
+				BOT_TOKEN_GITHUB: ${{ secrets.BOT_TOKEN_GITHUB}}
+				TEAM_NAME: ${{ secrets.TEAM_NAME}}
+				GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+```
+
+Asegúrate de que en `on: pull_request: branches` especificas el nombre de rama correcto.
+
+## Secrets
+En los settings del repositorio de Github debes añadir lo siguiente:
+
+-   `CHANNEL_ID` El ID del canal en cuestión sin el #
+-   `BOT_TOKEN_GITHUB` es el token del bot de slack
+-   `TEAM_NAME` el nombre del equipo del canal, pero sin el @
+
+
+## Slack
+En tu canal de Slack debes enviar un mensaje para iniciar el bot: `/invite @Github`  (asegúrate que añades al bot que está siempre Online, porque hay dos)
+
+
+🎉 Listo! Cada vez que cierres y abras una PR recibirás un mensaje automático en el canal

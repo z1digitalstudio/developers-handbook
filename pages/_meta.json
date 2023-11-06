@@ -6,10 +6,13 @@
   "best-practices": "Best practices",
   "apollo-client": "Apollo client",
   "docs": "Docs",
-  "ui-makers": "UI Makers",
+  "ui-bookmarks": "UI bookmarks",
   "manually-deploy-vercel": "Manually deploy to Vercel",
   "proposals": "Proposals",
-  "html-training": "HTML Training",
-  "global-styles": "Global styles",
-  "graphql-notes": "Notas sobre Graphql"
+  "html-training": "HTML training",
+  "graphql-notes": "Notas sobre Graphql",
+  "setup-slack-notifier": "Cómo conectar Slack y Github",
+  "stylelint": "Stylelint",
+  "troubleshooting": "Troubleshooting",
+  "snippets": "Snippets"
 }
