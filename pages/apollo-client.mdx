@@ -112,3 +112,17 @@ export const UPDATE_SOURCE = gql`
   ${SOURCE_DATA_FRAGMENT}
 `;
 ```
+
+###### [Debug Apollo client's cache misses [10](#point-10)]
+
+If you are having trouble with cache updates, it may be a good idea to check if the cache is being updated as you expect. You can do so by installin the Apollo Client Devtools extension for your browser. It will allow you to inspect the cache and see if the entities are being updated as you expect. Even in that case when a query doesn't hit the cache, it goes to the network, but Apollo will not log any error nor warning. To debug this, you can set the log level to debug in the Apollo Client's configuration.
+
+```typescript
+import { ApolloClient, InMemoryCache, setLogVerbosity } from "@apollo/client";
+
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+});
+
+setLogVerbosity("debug"); // This will log cache misses
+```
