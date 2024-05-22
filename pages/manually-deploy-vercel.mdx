@@ -252,7 +252,7 @@ Then, add the following workflows (make sure the environments names match your p
 ```
 pnpm version and updates libs:
 ```yml
-    Deploy-Vercel-Preview:
+  Deploy-Vercel-Preview:
     if: ${{ (github.event_name == 'pull_request') && (github.ref != 'refs/heads/main' || github.ref != 'refs/heads/develop')}}
     name: Deploy Vercel Preview
     runs-on: ubuntu-latest
