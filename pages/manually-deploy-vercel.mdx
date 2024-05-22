@@ -250,6 +250,66 @@ Then, add the following workflows (make sure the environments names match your p
           scope: ${{ secrets.VERCEL_ORG_ID }}
 
 ```
+pnpm version and updates libs:
+```yml
+    Deploy-Vercel-Preview:
+    if: ${{ (github.event_name == 'pull_request') && (github.ref != 'refs/heads/main' || github.ref != 'refs/heads/develop')}}
+    name: Deploy Vercel Preview
+    runs-on: ubuntu-latest
+    needs: [Build, Lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Step Preview
+        uses: amondnet/vercel-action@v25
+        id: deploy-vercel-preview
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+      - name: Preview URL
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Deploy Preview for ${{ steps.deploy-vercel-preview.outputs.preview-name }}
+            | Name | Link |
+            |------|------|
+            |😎 Deploy Previews|${{ steps.deploy-vercel-preview.outputs.preview-url }}|
+  Deploy-Vercel-Develop:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' }}
+    name: Deploy Vercel Develop
+    runs-on: ubuntu-latest
+    needs: [Build, Lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Step Develop
+        uses: amondnet/vercel-action@v25
+        id: deploy-vercel-staging
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+  Deploy-Production:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    name: Deploy Vercel Production
+    runs-on: ubuntu-latest
+    needs: [Build, Lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Step Production
+        uses: amondnet/vercel-action@v25
+        id: deploy-vercel-production
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          scope: ${{ secrets.VERCEL_ORG_ID }}
+
+
+```
 
 ## 5. Config Vercel project
 
