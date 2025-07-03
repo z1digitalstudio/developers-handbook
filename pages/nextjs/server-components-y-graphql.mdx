@@ -1,0 +1,307 @@
+# Server Components y GraphQL
+
+## Introducción
+
+Como sabéis, las nuevas versiones de Next.js usan server components por defecto.
+Esto tiene un impacto positivo en el rendimiento y en el SEO, pero ha supuesto
+un pequeño cambio de paradigma en el desarrollo de frontend.
+
+Ahora el contenido se renderiza en el servidor (como en el año 2000 😅) y los
+componentes que tengan cierta interactividad se deben marcar con `use client`
+para que se ejecuten en el navegador. Es decir, tu aplicación React, renderizada
+en el servidor (gracias a Server Components), puede hacer peticiones a un
+backend GraphQL 🫣.
+
+Todo esto nos ha forzado a buscar alternativas para realizar peticiones GraphQL
+desde esos server components.
+
+> <sup>(1)</sup> Poco antes de escribir esto, Apollo lanzó su
+> `@apollo/client-integration-nextjs`, por lo que puede que la que se describe a
+> continuación no sea ya una buena forma de solucionar el problema.
+
+## ¿Por qué no puedo seguir usando apollo?
+
+Claro que puedes. Pero por el momento solo en _client side_.
+
+Esto significa que tendrás que añadir `use client` en todas partes y prescindir
+de los _server components_, con lo que **perderás velocidad y SEO**.
+
+Sin embargo, usar un _provider_ de Apollo en el lado del cliente puede ser una
+buena idea si necesitas que parte de la aplicación funcione de manera distinta.
+
+Por ejemplo, puede que necesites añadir una pantalla de perfil de usuario. Esta
+puede funcionar solo en el navegador, ya que es un área privada y no es
+importante para SEO. Tendrías añadir un provider de apollo a tu aplicación, unos
+cuantos `use client` en la página de perfil y ya podrías usar los hooks de
+apollo como siempre.
+
+## ¿Puedo usar `fetch` o `axios`?
+
+Claro. Puedes hacer tus peticiones directamente al backend usando `fetch`:
+
+```typescript
+const data = await fetch("https://mi-api-graphql.com/graphql", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ query: "query { posts { id, slug, title }}" }),
+});
+```
+
+Esto puede estar bien para una aplicación sencilla, pero a medida que esta
+crezca te encontrarás con varios problemas:
+
+- El boilerplate es muy grande. Como sabemos, a más código que escribimos, más
+  posibilidades de meter la pata.
+- Los datos que devuelve fetch no están tipados, con lo que tendrás que
+  parsearlos y tiparlos a mano.
+
+## ¿Entonces, qué podemos usar?
+
+Una de las mejores opciones es `graphql-request` (está cambiando de nombre a
+`graffle`). Se trata de una librería pequeñita (solo 5k) que podemos usar con
+`codegen` y nos permite un acceso rápido y eficiente a un endpoint GraphQL desde
+los server components de Next.js.
+
+Al usar `codegen` simplemente tendremos que escribir las queries en archivos
+`*.gql`
+
+### Instalación
+
+Aparte del paquete `graphql-request` necesitaremos instalar `codegen`:
+
+```bash
+pnpm install graphql graphql-request graphql-tag
+```
+
+```bash
+pnpm install -D "@graphql-codegen/cli @graphql-codegen/client-preset @graphql-codegen/fragment-matcher \
+@graphql-codegen/introspection @graphql-codegen/schema-ast @graphql-codegen/typescript \
+@graphql-codegen/typescript-graphql-request @graphql-codegen/typescript-operations
+```
+
+### Configuración
+
+Una vez instalado podemos crear un archivo `graphql.codegen.yaml` en la raíz de
+nuestro proyecto, con este contenido básico:
+
+```yaml
+overwrite: true
+schema: ${API_ENDPOINT}
+documents: "src/graphql/**/*.gql"
+generates:
+  src/graphql/generated/index.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-graphql-request"
+    config:
+      rawRequest: true
+      content: "// @ts-nocheck"
+      strictScalars: true
+      useTypeImports: true
+      maybeValue: "T | undefined"
+      scalars:
+        BigDecimal: number
+        BigInteger: number
+        Long: number
+        Cursor: string
+        Date: string
+        DateTime: string
+        Email: string
+        Time: string
+        UUID: string
+        Void: undefined
+  src/graphql/generated/introspection.ts:
+    plugins:
+      - "fragment-matcher"
+    config:
+      useTypeImports: false
+  schema.graphql:
+    plugins:
+      - "schema-ast"
+hooks:
+  afterAllFileWrite:
+    - prettier --write
+```
+
+En él le decimos a codegen que lea nuestros archivos GraphQL en `src/graphql` y
+que genere el código en `src/graphql/generated/index.ts` y
+`src/graphql/generated/introspection.ts`. Esto significa que, cada vez que
+añadamos una query tendremos que ejecutar el script nuevamente para que se
+genere el código.
+
+Después podemos crear nuestra entrada en el archivo `package.json` para lanzar
+el codegen:
+
+```json
+"scripts": {
+  ...
+  "gen:types": "env-cmd -f .env graphql-codegen --config graphql.codegen.yml",
+}
+```
+
+### Uso
+
+Una vez ejecutado el codegen es hora de definir nuestro cliente graphql para
+poder usarlo en nuestra aplicación. Para ello definimos el cliente en el archivo
+`src/graphql/client.ts`, con el siguiente contenido:
+
+```ts
+import { GraphQLClient } from "graphql-request";
+import { getSdk } from "./generated";
+
+const client = new GraphQLClient(process.env.API_ENDPOINT!);
+
+export const sdk = getSdk(client);
+```
+
+Y a partir de ese momento podemos comenzar a realizar peticiones con las queries
+que hemos creado, de forma sencilla y con resultados completamente tipados.
+
+Por ejemplo en una página:
+
+```tsx
+import { sdk } from "$/graphql/client";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export default async function PostPage({ params }: Props) {
+  const { slug } = await params;
+  const { data } = await sdk.getPost({
+    slug,
+  });
+
+  const post = data.post;
+
+  return <div>{post.title}</div>;
+}
+```
+
+## FAQ
+
+### ¿Cómo puedo autenticar mis peticiones mediante un token?
+
+En nuestro archivo cliente podemos personalizar los headers con que realizamos
+las peticiones.
+
+```ts
+const client = new GraphQLClient(process.env.API_ENDPOINT!, {
+  headers: {
+    Authorization: `Bearer ${process.env.API_TOKEN!}`,
+  },
+});
+```
+
+### Necesito pasar tokens distintos según una de las variables de la query
+
+Esto tan raro puede pasar en CMS como Contenful, donde el token para las
+previews es distinto del que se usa para obtener los elementos publicados.
+
+Pero no hay problema. Problemas como este podemos resolverlo mediante un
+`middleware`.
+
+```ts
+import { GraphQLClient, RequestMiddleware } from "graphql-request";
+
+const requestMiddleware: RequestMiddleware = (request) => {
+  const token = !!(request.variables as { preview?: boolean })?.preview
+    ? process.env.ACCESS_TOKEN_PREVIEW!
+    : process.env.ACCESS_TOKEN!;
+
+  (request.headers as Headers).append("Authorization", `Bearer ${token}`);
+  return request;
+};
+
+const client = new GraphQLClient(process.env.API_ENDPOINT!, {
+  requestMiddleware,
+});
+```
+
+### Al hacer build el endpoint me da un error 429
+
+Un error 429 (Too many requests) se da cuando lanzamos muchas peticiones a la
+vez. Puede ocurrir que al hacer el build de una aplicación Next.js con muchas
+páginas estáticas, estemos lanzando un gran número de queries _repetidas_ a la
+vez.
+
+La forma lógica de arreglar esto es cacheando los resultados de las peticiones,
+de tal forma que, si nuestra página solicita 5 veces los mismos datos solo los
+pidamos al backend una vez. El resto de veces devolveremos la versión que hemos
+guardado.
+
+Esto se solía implementar en Next.js con fetch y `revalidate`. Sin embargo en
+las últimas versiones no cachea las peticiones POST, que precisamente son las
+que usamos para hacer peticiones GraphQL. Por lo tanto deberemos usar otro
+mecanismo, como el propio caché de react:
+
+```ts
+import { GraphQLClient } from "graphql-request";
+import { cache } from "react";
+
+const CACHE_TTL_MS = 60 * 1000;
+
+const client = new GraphQLClient(process.env.API_ENDPOINT!, {
+  fetch: cache(
+    (url: string | Request | URL, params: RequestInit | undefined) => {
+      return fetch(url, { ...params, next: { revalidate: CACHE_TTL_MS } });
+    },
+  ),
+});
+```
+
+Esto hará que, si pedimos la misma query (con los mismos parámetros), en un
+intervalo de menos de 60 segundos, nos devolverá los mismos datos en vez de
+pedirlos de nuevo al backend.
+
+### ¿Pueden convivir apollo y graphql-requests en el mismo proyecto?
+
+Por supuesto. Puedes crear tantos codegen y clientes distintos como quieras.
+Simplemente, hay que crear configuraciones separadas.
+
+Archivos de configuración distintos:
+
+```yaml
+# graphql.codgen.apollo.yaml
+# ....
+documents: "src/graphql/**/*.gql"
+# ....
+generates:
+  src/graphql/generated/apollo/index.ts:
+    # ...
+  src/graphql/generated/apollo/introspection.ts:
+    # ...
+```
+
+```yaml
+# graphql.codgen.graffle.yaml
+# ....
+documents: "src/graphql/**/*.gql"
+# ....
+generates:
+  src/graphql/generated/graffle/index.ts:
+    # ...
+  src/graphql/generated/graffle/introspection.ts:
+    # ...
+```
+
+Carpetas separadas:
+
+```
+src/
+├── graphql/
+├──── apollo/
+├──── graffle
+```
+
+Y scripts distintos:
+
+```json
+
+  "scripts": {
+    "gen:types": "pnpm gen:types:apollo; pnpm gen:types:graffle",
+    "gen:types:apollo": "env-cmd -f .env graphql-codegen --config graphql.codegen.apollo.yml",
+    "gen:types:graffle": "env-cmd -f .env graphql-codegen --config graphql.codegen.graffle.yml",
+  }
+```
