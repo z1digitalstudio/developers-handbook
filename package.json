@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next",
     "start": "next start",
-    "build": "next build"
+    "build": "next build",
+    "format": "prettier app/** --write"
   },
   "dependencies": {
     "next": "13.1.1",
@@ -17,6 +18,7 @@
   },
   "devDependencies": {
     "@types/node": "18.13.0",
+    "prettier": "^3.6.2",
     "typescript": "^4.9.5"
   }
 }
