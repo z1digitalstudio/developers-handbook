@@ -1,0 +1,321 @@
+# Vaultwarden Z1 Locker
+
+---
+
+## 1. System Overview
+
+This document describes the installation, configuration, deployment, maintenance, backups, restoration, security, and basic troubleshooting of the Vaultwarden system deployed on an AWS Lightsail instance running Ubuntu 24.04 LTS with Docker Compose.
+
+---
+
+## 2. Infrastructure
+
+- **Provider:** AWS Lightsail  
+- **Instance:** 1 GB RAM, 2 vCPUs, 40 GB SSD  
+- **Operating System:** Ubuntu 24.04.2 LTS  
+- **Firewall:** Lightsail firewall with ports 80 and 443 open (HTTP/HTTPS)  
+- **Services:** Vaultwarden, Caddy (TLS reverse proxy), Backup container
+
+---
+
+## 3. Architecture and Docker Compose
+
+### `docker-compose.yml`
+
+```yaml
+version: "3.8"
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    environment:
+      - WEBSOCKET_ENABLED=true
+      - SIGNUPS_ALLOWED=false
+      - ROCKET_PORT=8080
+      - ADMIN_TOKEN=E8UWdQV//0tUQgna4pTO/xfHNi5t99B57ZyB97SsLrlMzyyGSD+K3DStQpfJhpk8
+    volumes:
+      - ./vw-data:/data
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy-data:/data
+      - ./caddy-config:/config
+
+  backup:
+    image: ttionya/vaultwarden-backup:latest
+    container_name: vaultwarden-backup
+    restart: unless-stopped
+    volumes:
+      - ./vw-data:/bitwarden/data:ro
+      - ./vw-backup:/bitwarden/backup
+      - vaultwarden-rclone-data:/config
+      - ./rclone:/config/rclone/
+    environment:
+      - ZIP_PASSWORD=z1.digital!
+      - BACKUP_KEEP_DAYS=7
+      - RCLONE_REMOTE_NAME=BitwardenBackup
+      - ZIP_ENABLE=TRUE
+      - ZIP_TYPE=zip
+      - TIMEZONE=Europe/Madrid
+
+volumes:
+  vaultwarden-rclone-data:
+```
+
+**Notes:**  
+- The `./rclone` folder contains the rclone OAuth config (credentials, tokens).  
+- The backup container mounts `./rclone` at `/config/rclone` to access OAuth config.  
+- Environment variables configure backup encryption and rclone remote name (`BitwardenBackup`).  
+- Vaultwarden exposes internal port 8080, proxied by Caddy.
+- ADMIN_TOKEN can be used to config some aspects like the SMTP Server under locker.z1.digital/admin
+
+---
+
+## 4. Caddy Configuration
+
+`Caddyfile` located at `./Caddyfile`:
+
+```
+locker.z1.digital {
+  reverse_proxy vaultwarden:8080
+
+  encode gzip
+
+  header {
+    Strict-Transport-Security "max-age=31536000;"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "no-referrer"
+  }
+}
+```
+
+- HTTPS reverse proxy with automatic TLS certificates.  
+- Security headers for enhanced protection.  
+- Gzip compression enabled.
+
+---
+
+## 5. Folder Structure
+
+```bash
+vaultwarden-docker/
+├── Caddyfile
+├── caddy-config/
+├── caddy-data/
+├── docker-compose.yml
+├── rclone/
+├── vw-backup/
+└── vw-data/
+```
+
+- `vw-data`: persistent Vaultwarden data.  
+- `vw-backup`: generated backups.  
+- `rclone`: rclone OAuth configuration files.  
+- `caddy-config` and `caddy-data`: Caddy configuration and storage.
+
+---
+
+## 6. Backup
+
+### Automatic Backup
+
+- The `vaultwarden-backup` container performs daily backups automatically.  
+- Backups are encrypted with password `z1.digital!`.  
+- Backups are saved as `.zip` files in `vw-backup` and uploaded to Google Drive (folder `z1LockerBackups`) via rclone using OAuth.
+
+### Backup Schedule (CRON)
+
+- Backup runs via a CRON schedule managed inside the backup container using **supercronic**.  
+- Default CRON schedule:  
+  ```
+  5 * * * *  
+  ```
+  This means the backup script runs every hour at 5 minutes past the hour.  
+
+### Manual Backup
+
+To manually trigger a backup at any time:
+
+```bash
+docker exec vaultwarden-backup /bin/sh -c "backup.sh"
+```
+
+This will immediately run the backup script with the configured settings.
+
+---
+
+## 7. Restoration
+
+To restore from a backup:
+
+1. Stop the Vaultwarden and backup containers:
+
+```bash
+docker-compose down
+```
+
+2. Obtain the backup `.zip` file from `vw-backup` or Google Drive.  
+3. Extract the backup to the `vw-data` folder:
+
+```bash
+unzip backupfile.zip -d ./vw-data
+```
+
+4. Adjust permissions if needed so Docker can access the data.  
+5. Start the containers again:
+
+```bash
+docker-compose up -d
+```
+
+For more detailed info, refer to: https://github.com/ttionya/vaultwarden-backup
+
+---
+
+## 8. rclone Configuration with OAuth for Google Drive
+
+### Steps to set up rclone for backups
+
+1. **Create a Google Cloud project**
+
+   - Go to [Google Cloud Console](https://console.cloud.google.com/).  
+   - Create a new project (e.g., `Vaultwarden Backup`).  
+   - Enable Google Drive API in **APIs & Services > Library**.
+
+2. **Configure OAuth consent screen**
+
+   - Navigate to **APIs & Services > OAuth consent screen**.  
+   - Set user type to External.  
+   - Fill required fields: app name, support email, etc.  
+   - Save.
+
+3. **Create OAuth credentials**
+
+   - Go to **APIs & Services > Credentials**.  
+   - Click **Create credentials > OAuth client ID**.  
+   - Choose Application type: Desktop app.  
+   - Download the JSON file with the credentials.
+
+4. **Configure rclone locally**
+
+   - Install rclone on your local machine or use Docker.  
+   - Run:
+
+```bash
+rclone config
+```
+
+   - Create a new remote:  
+     - Name: `BitwardenBackup`  
+     - Type: `drive`  
+     - Enter client ID and client secret from the downloaded JSON.  
+     - Set scope to full access.  
+     - Authorize the app via the URL provided.  
+     - Finish the setup.
+
+5. **Copy rclone config to the server**
+
+   - Copy the generated `rclone.conf` (usually in `~/.config/rclone/`) to the `rclone/` folder in your Vaultwarden server.  
+   - Make sure permissions allow the backup container to read it.
+
+6. **Verify setup**
+
+   From the backup container or server, run:
+
+```bash
+docker exec vaultwarden-backup rclone ls BitwardenBackup:
+```
+
+If it lists files on your Google Drive, the config is correct.
+
+---
+
+## 9. Security
+
+- Lightsail firewall only opens ports 80 and 443.  
+- Caddy adds security headers (HSTS, X-Frame-Options, etc).  
+- Vaultwarden uses `ADMIN_TOKEN` for admin interface protection.  
+- Backups encrypted with password `z1.digital!`.  
+- Minimal Ubuntu installation to reduce attack surface and don't waste resources.
+
+---
+
+## 10. Monitoring and Logs
+
+- View container logs:
+
+```bash
+docker logs vaultwarden
+docker logs caddy
+docker logs vaultwarden-backup
+```
+
+- Check container status:
+
+```bash
+docker ps
+```
+
+- Monitor system resources:
+
+```bash
+htop  # if installed
+df -h
+free -m
+```
+
+---
+
+## 11. Installation and Deployment
+
+### Prerequisites
+
+- Lightsail instance running Ubuntu 24.04  
+- Firewall open on ports 80 and 443  
+- SSH access with sudo permissions
+
+### Install Docker & Docker Compose
+
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y docker.io docker-compose
+sudo systemctl enable --now docker
+```
+
+### Deployment Steps
+
+1. Transfer folder structure and files to server  
+2. Configure `docker-compose.yml`, `Caddyfile`, and place rclone OAuth config in `rclone/`  
+3. Start containers:
+
+```bash
+docker-compose up -d
+```
+
+4. Verify Vaultwarden is accessible at `https://locker.z1.digital`
+
+---
+
+## 12. Basic Troubleshooting
+
+| Issue                        | Possible Cause                                 | Suggested Fix                                |
+|------------------------------|-----------------------------------------------|----------------------------------------------|
+| Vaultwarden fails to start    | Invalid ADMIN_TOKEN or corrupted data         | Check logs `docker logs vaultwarden`; fix token or restore backup |
+| Cannot access HTTPS           | Caddy TLS certificate not issued               | Check `docker logs caddy`; verify DNS and port 443 firewall |
+| Backup not uploading to Drive | Wrong rclone config or expired OAuth token     | Validate rclone config; refresh OAuth tokens; run `rclone ls BitwardenBackup:` inside backup container |
+| Backups not generated         | Backup container stopped or internal error     | Check container status `docker ps`; check logs `docker logs vaultwarden-backup` |
+| Disk space full               | Accumulated data or old backups not removed    | Clean disk; check `BACKUP_KEEP_DAYS` retention policy |
+
+
