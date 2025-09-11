@@ -1,0 +1,319 @@
+# Login Social con Firebase
+
+Muchas veces resulta complicado configurar el login con Apple o Google. Esta
+pequeña guía explica como hacerlo de forma sencilla con Firebase.
+
+Estos pasos están pensados para un backend con Django y un frontend con React,
+pero seguro que puedes hacerlo con cualquier otro framework.
+
+## Crea un proyecto en Firebase.
+
+Abre [Firebase](https://console.firebase.google.com) y crea un nuevo proyecto.
+Luego crea una nueva **app web** en ese proyecto. Firebase te dará unos valores
+de configuración parecidos a estos:
+
+```js
+{
+  apiKey: "xxxxxxxxxx-xxxxxxxxxxxxxx-xxxxxxxxxxxxx",
+  authDomain: "xxxxxx.firebaseapp.com",
+  projectId: "xxxxxx",
+  storageBucket: "xxxxxx.firebasestorage.app",
+  messagingSenderId: "12345678901",
+  appId: "1:12345678901:web:xxxxxxxxxxxxxxxxxxxxxx"
+};
+```
+
+Guárdalos. Los usarás en tu frontend.
+
+### Configura el login con Google y Apple.
+
+Ahora busca "Authentication" en el panel de la izquierda y selecciona "Métodos
+de acceso". Añade los que necesites.
+
+Después navega a configuración (también dentro de "Authentication") y en
+"Dominios autorizados" añade los que necesites en tu aplicación.
+
+Si añades Apple necesitas crear un nuevo proyecto en Apple Developer, e
+introducir ciertos valores.
+
+#### Pasos adicionales para Apple
+
+Para configurar Apple necesitas crear un nuevo proyecto en Apple Developer.
+Luego, al habilitar el login con Apple en Firebase, deberás rellenar algunos
+datos adicionales:
+
+- ID de servicios
+- ID del equipo
+- ID de clave
+- Clave privada
+
+### Obtén la cuenta de servicio para usar en tu backend.
+
+En la configuración general de Firebase, busca "Cuentas de servicio" y crea una
+nueva calve privada. Esto generará un archivo `.json` que se descargará
+automáticamente. Guárdalo para usar luego en el backend.
+
+## Configura tu backend.
+
+Suponiendo que usas un backend con Django y GraphQL, puedes empezar con una
+mutación sencilla como esta:
+
+```python
+
+import firebase_admin
+from firebase_admin import auth as firebase_auth
+from firebase_admin import credentials
+
+
+if not firebase_admin._apps and settings.FIREBASE_SERVICE_ACCOUNT:
+    cred = credentials.Certificate(settings.FIREBASE_SERVICE_ACCOUNT)
+    firebase_admin.initialize_app(cred)
+
+@strawberry.input
+class FirebaseLoginInput:
+    token: str
+
+class Mutation:
+
+    [...]
+
+    @strawberry.mutation
+    def firebase_login(self, info: Info, input: FirebaseLoginInput) -> UserType:
+        decoded_token = firebase_auth.verify_id_token(input.token)
+        email = decoded_token.get("email", "")
+        if not email:
+            raise Exception(WRONG_CREDENTIALS)
+
+        user, created = User.objects.get_or_create(email=email)
+        login(info.context.request, user)
+
+        user.last_login = timezone.now()
+        user.save()
+
+        return user
+```
+
+En tus settings deberías tener algo como esto:
+
+- Si usas environment variables:
+
+```python
+FIREBASE_SERVICE_ACCOUNT = {
+    "type": os.getenv("FIREBASE_TYPE"),
+    "project_id": os.getenv("FIREBASE_PROJECT_ID"),
+    "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
+    "private_key": os.getenv("FIREBASE_PRIVATE_KEY", "").replace("\\n", "\n"),
+    "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
+    "client_id": os.getenv("FIREBASE_CLIENT_ID"),
+    "auth_uri": os.getenv("FIREBASE_AUTH_URI"),
+    "token_uri": os.getenv("FIREBASE_TOKEN_URI"),
+    "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_X509_CERT_URL"),
+    "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_X509_CERT_URL"),
+    "universe_domain": os.getenv("FIREBASE_UNIVERSE_DOMAIN"),
+}
+```
+
+- O si usas AWS Secrets Manager:
+
+```python
+FIREBASE_SERVICE_ACCOUNT = {
+    "type": secrets.get_secret("FIREBASE_TYPE"),
+    "project_id": secrets.get_secret("FIREBASE_PROJECT_ID"),
+    "private_key_id": secrets.get_secret("FIREBASE_PRIVATE_KEY_ID"),
+    "private_key": secrets.get_secret("FIREBASE_PRIVATE_KEY").replace("\\n", "\n"),
+    "client_email": secrets.get_secret("FIREBASE_CLIENT_EMAIL"),
+    "client_id": secrets.get_secret("FIREBASE_CLIENT_ID"),
+    "auth_uri": secrets.get_secret("FIREBASE_AUTH_URI"),
+    "token_uri": secrets.get_secret("FIREBASE_TOKEN_URI"),
+    "auth_provider_x509_cert_url": secrets.get_secret(
+        "FIREBASE_AUTH_PROVIDER_X509_CERT_URL"
+    ),
+    "client_x509_cert_url": secrets.get_secret("FIREBASE_CLIENT_X509_CERT_URL"),
+    "universe_domain": secrets.get_secret("FIREBASE_UNIVERSE_DOMAIN"),
+}
+```
+
+Los valores de los secrets están en el archivo json que te descargaste de
+Firebase, al crear la cuenta de servicio.
+
+## Configura tu frontend.
+
+En fronted también necesitas algunas variables de entorno. Son las que te mostró
+Firebase en el primer paso, al crear la app web. Una vez configuradas, puedes
+usar un hook como este:
+
+```ts
+import { useFirebaseLoginMutation } from "$/graphql/generated/apollo";
+
+import { getApp, getApps, initializeApp } from "firebase/app";
+import {
+  GoogleAuthProvider,
+  OAuthProvider,
+  getAuth,
+  signOut,
+  signInWithPopup,
+} from "firebase/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+};
+
+// Avoid multiple initialization
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+
+const auth = getAuth(app);
+
+export function useFirebaseLogin({
+  afterLoginRedirect,
+}: {
+  afterLoginRedirect: string;
+}) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
+  const [isLoading, setIsLoading] = useState(false);
+  const [performFirebaseLoginMutation] = useFirebaseLoginMutation();
+
+  const performLoginAndRedirect = async (token: string) => {
+    await performFirebaseLoginMutation({
+      variables: { input: { token } },
+    });
+
+    router.push(redirect || afterLoginRedirect);
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      setIsLoading(true);
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const token = await result.user.getIdToken();
+
+      if (token) {
+        await performLoginAndRedirect(token);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error); // show toast?
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    try {
+      setIsLoading(true);
+      const provider = new OAuthProvider("apple.com");
+      provider.addScope("email");
+
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const token = await user.getIdToken();
+
+      if (token) {
+        await performLoginAndRedirect(token);
+      }
+    } catch (error) {
+      console.error(error); // show toast?
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFirebaseLogout = async () => {
+    await signOut(auth);
+  };
+
+  return {
+    handleGoogleLogin,
+    handleAppleLogin,
+    handleFirebaseLogout,
+    isLoading,
+  };
+}
+```
+
+En él simplemente se obtiene el token de Firebase y lo pasamos al backend. El
+backend se encarga de comprobar el token y crear o actualizar el usuario. Así de
+simple.
+
+Ahora simplemente usa este hook y llama al "handle" que corresponda en tus
+botones de login. Recuerda llamar a `handleFirebaseLogout` antes de hacer logout
+de tu aplicación, para borrar también la sesión en firebase.
+
+Y listo. Sencillito. O no?
+
+## Entonces llego ...Safari 😥
+
+Safari bloquea las cookies de terceros. Es decir, si tu web y firebase no están
+en el mismo dominio no funcionará. Tienes 2 opciones (bueno 3):
+
+- **No soportar Safari**. Esta es la que más me gustaría poder implementar.
+
+- **Usar firebase hosting**. Si _hosteas_ tu web en firebase este problema
+  desaparecerá, porque todo estará en un mismo dominio (tu web y firebase).
+
+- **Usar un proxy**. Puedes configurar un proxy para cargar la api de firebase
+  en el mismo dominio que tu web. Con esto no habrá problemas de cookies, pero
+  necesitarás configurar algunas urls adicionales en tus proveedores de Auth0.
+
+### 1. Configura tu proxy.
+
+En Next.js puedes añadir un proxy en el archivo `next.config.js`:
+
+```js
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/__/auth/:path*',
+        destination: `https://xxxx.firebaseapp.com/__/auth/:path*`,
+      }
+    ];
+  }
+```
+
+Donde el dominio de firebase es el que aparece en la configuración general que
+obtuviste al crear tu app.
+
+### 2. Configura tu web.
+
+Al mismo tiempo deberás modificar `authDomain`, que en nuestro caso es la
+variable de entorno `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, y poner el dominio de tu
+web.
+
+Así, las peticiones de firebase se cargan en tu dominio.
+
+### 3. Añade el dominio a la configuración de cada proveedor de Auth0.
+
+Sí, tendrás que añadir el dominio a **todos** los proveedores de Auth0.
+
+#### Google:
+
+Entra en [Google Cloud console](https://console.cloud.google.com) y busca el
+proyecto en cuestión. Se habrá creado al crear la app en firebase.
+
+Ahora localiza el apartado "Credenciales" (puedes buscarlo). Dentro, verás una
+sección llamada "IDs de clientes de OAuth 2.0". Identifica tu cliente (será de
+tipo Web) y modifícalo.
+
+En el apartado "URIs de redireccionamiento autorizados" añade las que necesites.
+Deberás incluír el dominio y la ruta del proxy. Por ejemplo:
+
+`https://www.example.com/__/auth/handler`
+
+#### Apple:
+
+Entra en la cuenta de Apple developer, y en la configuración de "Sign with
+Apple" podrás añadir las rutas que necesites.
+
+Cómo con google, deberás incluír el dominio y la ruta del proxy. Por ejemplo:
+
+`https://www.example.com/__/auth/handler`
