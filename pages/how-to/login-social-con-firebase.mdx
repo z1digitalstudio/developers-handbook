@@ -266,6 +266,14 @@ en el mismo dominio no funcionará. Tienes 2 opciones (bueno 3):
 
 ### 1. Configura tu proxy.
 
+En general deberás añadir un proxy inverso hacia tu dominio de authenticación de
+firebase. El dominio es el que aparece en la configuración general que obtuviste
+al crear tu app, en el campo `authDomain`.
+
+La forma de hacerlo puede variar dependiendo de la plataforma.
+
+#### Next.JS
+
 En Next.js puedes añadir un proxy en el archivo `next.config.js`:
 
 ```js
@@ -280,8 +288,46 @@ module.exports = {
   }
 ```
 
-Donde el dominio de firebase es el que aparece en la configuración general que
-obtuviste al crear tu app.
+#### Railway con SPA
+
+Railway con SPA utilizar por defecto [Caddy](https://caddyserver.com/) como
+servidor web, por lo que deberás configurar el proxy en tu `Caddyfile`. Este es
+un ejemplo para React con Vite:
+
+```
+# Caddyfile
+:{$PORT:8080} {
+	handle /__/auth/* {
+		reverse_proxy https://{$FIREBASE_ORIGINAL_AUTH_DOMAIN} {
+			header_up Host {http.reverse_proxy.upstream.hostport}
+      header_up X-Forwarded-Host {host}
+      header_up X-Forwarded-Proto {scheme}
+		}
+	}
+
+	handle {
+		root * {$STATIC_PATH:/app/dist}
+		try_files {path} /index.html
+		file_server
+	}
+}
+```
+
+Recuerda añadir la variable `FIREBASE_ORIGINAL_AUTH_DOMAIN` con el valor
+original de tu `authDomain` a tu configuración de railway, o simplemente
+_hard-codearla_ en el archivo.
+
+**Importante:** al momento de escribir esto hay un bug en la UI de railway, por
+lo que deberás añadir el fichero `railway.json` para forzar el uso de _Railpack_
+como builder:
+
+```json
+{
+  "build": {
+    "builder": "RAILPACK"
+  }
+}
+```
 
 ### 2. Configura tu web.
 
