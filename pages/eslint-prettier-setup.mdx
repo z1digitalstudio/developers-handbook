@@ -1,0 +1,169 @@
+# ESLint and Prettier Setup Guide
+
+---
+
+- 😸 Author: Daniela Witteveen
+- 🗓️ Last updated: 14/10/2025
+
+---
+
+> **Note:** This guide is specifically designed for ESLint v9 with the new flat
+> config format and Prettier v3. Check for newer versions of these tools, as
+> they may introduce changes that could affect the configuration steps described
+> here.
+
+This guide will walk you through setting up ESLint and Prettier for a TypeScript
+React project, ensuring consistent code formatting and linting across your team.
+
+## Step 1: Initialize ESLint
+
+Run the ESLint initialization command as described in the
+[official ESLint documentation](https://eslint.org/docs/latest/use/getting-started#quick-start):
+
+```bash
+pnpm create @eslint/config@latest
+```
+
+**Important:** During the configuration process, choose all default options
+except for TypeScript. Make sure to select TypeScript when prompted, as we want
+to use TypeScript in our project.
+
+## Step 2: Add Required Plugins
+
+After the initial setup, you'll need to add additional plugins for React,
+Typescript and Prettier integration. Install the required dependencies:
+
+```bash
+pnpm add -D eslint-plugin-prettier eslint-plugin-react globals typescript-eslint
+```
+
+Your `eslint.config.ts` file should look like this:
+
+```typescript
+import js from "@eslint/js";
+
+import eslintPluginPrettier from "eslint-plugin-prettier/recommended";
+import pluginReact from "eslint-plugin-react";
+import { defineConfig } from "eslint/config";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+
+export default defineConfig([
+  {
+    files: ["**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    plugins: { js },
+    extends: ["js/recommended"],
+    languageOptions: { globals: globals.browser },
+  },
+  tseslint.configs.recommended,
+  pluginReact.configs.flat.recommended,
+  pluginReact.configs.flat["jsx-runtime"],
+  // Must be the last one
+  eslintPluginPrettier,
+  {
+    ignores: ["src/graphql/generated/**"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          ignoreRestSiblings: true,
+        },
+      ],
+    },
+  },
+]);
+```
+
+## Step 3: Configure Prettier
+
+Create a `prettier.config.js` file in your project root with your preferred
+formatting rules:
+
+```bash
+pnpm add -D prettier prettier-plugin-tailwindcss @trivago/prettier-plugin-sort-imports
+```
+
+Your `prettier.config.js` file should look like this:
+
+```javascript
+/** @type {import('prettier').Config} */
+const config = {
+  bracketSpacing: true,
+  bracketSameLine: false,
+  semi: true,
+  singleQuote: false,
+  trailingComma: "all",
+  tabWidth: 2,
+  plugins: [
+    "prettier-plugin-tailwindcss",
+    "@trivago/prettier-plugin-sort-imports",
+  ],
+  importOrder: ["^\\@|\\$|\\#", "^[a-z]", "^\\."],
+  importOrderSeparation: true,
+  importOrderSortSpecifiers: true,
+};
+
+export default config;
+```
+
+## Step 4: VS Code Integration
+
+To ensure Prettier runs on save and that your entire team has the same
+configuration, create a `.vscode/settings.json` file in your project root:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "files.watcherExclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "search.exclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "files.readonlyInclude": {
+    "**/routeTree.gen.ts": true
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "tailwindCSS.classFunctions": ["tw", "clsx", "cva"]
+}
+```
+
+## Usage
+
+After completing these steps:
+
+- ESLint will automatically lint your code and show warnings/errors
+- Prettier will format your code on save in VS Code
+- Your team will have consistent code formatting and linting rules
+
+## Running Commands
+
+You can also run these tools manually:
+
+```bash
+# Run ESLint
+pnpm eslint .
+
+# Run Prettier
+pnpm prettier --write .
+```
+
+This setup ensures a consistent development experience across your entire team
+while maintaining high code quality standards.
