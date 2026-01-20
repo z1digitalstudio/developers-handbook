@@ -542,6 +542,24 @@ export const StepsList = () => {
 </ol>
 ```
 
+## Forms
+
+### Label
+
+Each `input` must have a `label` connected which should have a text inside. Thought there are anothers ways to make a form field accesible this is the standar. A quick check that a label is asign to the input is that if you click the label the input it should focus.
+
+```html
+<label for="peas">Do you like peas?</label>
+<input type="text" name="peas" id="peas" />
+```
+
+```html
+<label>
+  <span>Do you like peas?</span>
+  <input type="text" name="peas" />
+</label>
+```
+
 ## Landmarks
 
 Use the appropriate landmarks to identify the different regions of content on a web page. The most important landmark roles are `main` and `navigation`, as nearly every page will include at least those regions.
