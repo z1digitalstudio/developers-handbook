@@ -9,4 +9,82 @@
 
 This is a quick guide on how to review the accessibility basics of websites and web applications.
 
+## Review with automatic tools
 
+Before do a manual review we could use automatic testing to find easly common issues, although fixing those doesn't mean is accessible it's a good start!
+
+### Code validation
+
+Validators have been part of web development for a long time, we should validate our code to ensure that for example the HTML, SVG, JavaScript and CSS don't have errors, browsers nowadays render it anyway but it could cause unexpected behaviour and accessibility issues.
+
+- [W3C validators and tools](https://www.w3.org/developers/tools/)
+- [JSlint validator](https://www.jslint.com/)
+
+### Accessibility testing
+
+The testing tools help us find accessibility issues like color contrast, missing labels or image alt attributes, heading skipped levels, links and buttons without descriptive texts and that kind of things that are easy to fix.
+
+- [WAVE Accessibility Extension](https://wave.webaim.org/extension/)
+- axe DevTools - Web Accessibility Testing
+- Firefox Accessibility Inspector
+- Lighthouse or PageSpeed Insights
+- Storybook Accessibility (a11y) addon
+- Webflow Audit panel, Vision Preview and Color contrast tools
+
+## Review manually
+
+Accessibility audits required experts and specific tools, we could at least review the most common use cases, like navigation by keyboard, screen reader and with browser setups like bigger text or zoom.
+
+### User config
+
+We should check different devices and browsers, combining configuration and possible scenarios, overall the things that are not cover by automatic tools.
+
+- Browsers and devices
+- Responsive screen sizes
+- Zoom to 200%
+- Text size to 200% (32px)
+- Prefers reduced motion
+- Prefers color scheme
+- Contrast loss and no color
+- Alternatives to drag and drop
+- Interactive elements minimal size
+- Language translation
+
+### Keyboard
+
+For the navigation by keyboard we have to ensure all the interactive elements have visible focus and the user experience to be easy and functional, usually native elements and default behavior it's the better approach.
+
+- Skip to main content as first link
+- Universal or custom focus visible styles
+- Navigation by keyboard between interactive elements
+- Logical order of focus and interactions
+- Keep default and native keyboard behavior
+- Avoid to focus hidden content or show when is focused
+- Focus alternative for none decorative hover
+
+### Screen reader
+
+There are many ways to use a screen reader, for example we can read all the page, jump between elements and use the rotor, where there are listed interactive and semantic elements, is a great way to get to know the content quickcly.
+
+- In our work laptops we have VoiceOver in Mac OS
+- Every text and visual element must be read
+- Do not include in accesible texts the element (navigation, link, button)
+- Images with descriptive and meaninful alt texts
+- Do not announce too many decorative images or redundant information
+- Structure with landmarks (banner, main, contentinfo)
+- Secondary navigations with descriptive label
+- Articles with unique headlines
+- Simple content organization with heading levels
+- Navigation and repeated items as lists to know the total number
+- Links with descriptive and unique texts to identify them
+- Keep the repeated text after so can be skipped
+- Buttons with actions
+- Form elements with labels and groups or sections
+- Semantic tables with headers and descriptive content
+
+## Accessibility checklists
+
+While specifications and laws are the reference for experts these kind of lists are great to review the main accessibility requirements.
+
+- [The A11Y Project checklist](https://www.a11yproject.com/checklist/)
+- [Webflow accessibility checklist](https://webflow.com/accessibility/checklist)
