@@ -1,6 +1,6 @@
 # Tutorial: traspaso de proyecto Railway entre cuentas o workspaces
 
-Guía práctica para mover un proyecto (servicios, base de datos y bucket) cuando Railway **no permite transferir buckets** entre workspaces o cuando quieres una copia local fiable antes de cualquier operación destructiva.
+Guía práctica para mover un proyecto (servicios, base de datos y bucket) cuando Railway **no permite transferir buckets** entre workspaces o cuando quieres una copia local fiable antes de cualquier operación destructiva. Los backups de **bucket** y de **PostgreSQL** deben cubrir **todos los entornos** que uséis (producción, staging, etc.), no solo uno.
 
 > **Seguridad:** en este documento todas las claves, tokens y contraseñas son **ejemplos ficticios**. Sustituye cada marcador por los valores reales de tu panel de Railway o de tu proveedor, y **nunca** subas a Git archivos `.env` con credenciales.
 
@@ -11,12 +11,12 @@ Guía práctica para mover un proyecto (servicios, base de datos y bucket) cuand
 | Fase | Acción |
 |------|--------|
 | 1 | Descargar objetos de **todos** los buckets (por entorno) con la CLI de AWS |
-| 2 | Volcar la base de datos PostgreSQL (`pg_dump`) |
+| 2 | Volcar **cada** base de datos PostgreSQL (`pg_dump`), **un volcado por entorno** que tengáis |
 | 3 | Comprobar plan Pro y acceso GitHub del destino |
 | 4 | Transferir el proyecto desde **Settings** (eliminando el bucket en origen si Railway lo exige) |
-| 5 | Revisar variables de entorno y datos en PostgreSQL |
-| 6 | Subir objetos al bucket nuevo |
-| 7 | Actualizar URLs persistidas en BD (**depende del stack**; el comando o script lo creas en el repositorio del proyecto) |
+| 5 | Revisar variables de entorno y datos en PostgreSQL (**por entorno**) |
+| 6 | Subir objetos a **cada** bucket nuevo (uno por entorno) |
+| 7 | Actualizar URLs persistidas en BD (**depende del stack**; el comando o script lo creas en el repositorio del proyecto; **por entorno** si hay varias bases) |
 
 ---
 
@@ -73,30 +73,43 @@ Comprueba que la carpeta tiene tamaño y número de archivos razonables antes de
 
 ---
 
-## 2. Backup de la base de datos
+## 2. Backup de la base de datos en todos los entornos
+
+Igual que con los buckets, en Railway puede haber **un servicio PostgreSQL por entorno** (producción, staging, preview, etc.) o varias bases que debáis conservar. **Repite este apartado por cada entorno** del que necesitéis copia: usa la URL pública de **ese** Postgres y guarda un fichero de volcado **distinto** por entorno para no mezclar datos.
 
 ### 2.1. URL pública de PostgreSQL
 
-En el servicio **PostgreSQL** de origen, activa **Public Networking** si hace falta y copia la **`DATABASE_PUBLIC_URL`** (no uses la URL interna `*.railway.internal` desde tu ordenador).
+En el servicio **PostgreSQL** del entorno concreto, activa **Public Networking** si hace falta y copia la **`DATABASE_PUBLIC_URL`** (no uses la URL interna `*.railway.internal` desde tu ordenador).
 
-### 2.2. Volcado en formato custom
+### 2.2. Carpeta local y nombre del volcado por entorno
 
-Desde la carpeta donde quieras guardar el archivo:
+Organiza los dumps como hiciste con los buckets, por ejemplo:
 
 ```bash
-pg_dump -Fc "postgresql://USUARIO:CONTRASEÑA@HOST_PUBLICO:PUERTO/BASE_DE_DATOS" > backup.dump
+mkdir -p ~/backups/railway/dumps-prod
+cd ~/backups/railway/dumps-prod
+```
+
+Usa un nombre de archivo que identifique el entorno (`backup-prod.dump`, `backup-staging.dump`, etc.).
+
+### 2.3. Volcado en formato custom
+
+Desde la carpeta del entorno:
+
+```bash
+pg_dump -Fc "postgresql://USUARIO:CONTRASEÑA@HOST_PUBLICO:PUERTO/BASE_DE_DATOS" > backup-ENTORNO.dump
 ```
 
 Ejemplo **anonimizado** (sustituye por tu cadena real):
 
 ```bash
-pg_dump -Fc "postgresql://postgres:REDACTED@monorail.proxy.rlwy.net:12345/railway" > backup.dump
+pg_dump -Fc "postgresql://postgres:REDACTED@monorail.proxy.rlwy.net:12345/railway" > backup-prod.dump
 ```
 
 Opcional: validar el dump sin restaurar:
 
 ```bash
-pg_restore -l backup.dump | head
+pg_restore -l backup-prod.dump | head
 ```
 
 ---
@@ -111,7 +124,7 @@ pg_restore -l backup.dump | head
 ## 4. Transferir el proyecto
 
 1. En Railway: **Project → Settings** y usa la opción de transferencia que corresponda (**Transfer Project** entre workspaces o **Transfer Ownership** a otro usuario, según tu caso).
-2. Si el modal indica que **los buckets no se transfieren**, elimina el bucket en el proyecto de origen **solo después** de tener el backup del apartado 1 verificado.
+2. Si el modal indica que **los buckets no se transfieren**, elimina el bucket en el proyecto de origen **solo después** de tener el backup del apartado 1 verificado. Del mismo modo, no des por cerrada la migración sin haber completado los volcados del apartado 2 **para todos los entornos** que deban conservarse.
 3. El destinatario debe **aceptar** la transferencia dentro del plazo que indique Railway (por ejemplo 24 h en transferencias a otro usuario).
 
 ---
@@ -120,32 +133,32 @@ pg_restore -l backup.dump | head
 
 ### 5.1. Variables de entorno
 
-Revisa en el servicio de la aplicación (y en el Postgres nuevo, si aplica) que existan, entre otras:
+Revisa **en cada entorno** del proyecto transferido el servicio de la aplicación (y el Postgres de ese entorno, si aplica) y comprueba, entre otras:
 
 - Conexión a base de datos (`DATABASE_URL` o variables equivalentes).
 - Credenciales del **nuevo** bucket (`RAILWAY_BUCKET_*`, o las que use tu `settings` / preset de Railway).
 
 ### 5.2. Comprobar datos en PostgreSQL
 
-Si la base de datos **no** llegó completa o el servicio es nuevo, restaura el volcado usando la **URL pública** del Postgres **destino**:
+Si la base de datos **no** llegó completa o el servicio es nuevo, restaura el volcado correspondiente usando la **URL pública** del Postgres **destino de ese mismo entorno** (staging con dump de staging, producción con dump de producción, etc.):
 
 ```bash
-cd ~/backups/railway
+cd ~/backups/railway/dumps-prod
 pg_restore -d "postgresql://postgres:REDACTED@monorail.proxy.rlwy.net:99999/railway" \
   --no-owner --no-privileges --clean --if-exists \
-  backup.dump
+  backup-prod.dump
 ```
 
 - `--no-owner` y `--no-privileges` evitan choques con usuarios distintos al origen.
 - `--clean --if-exists` ayuda si el destino ya tenía esquema creado por migraciones.
 
-Cuando termines, puedes desactivar de nuevo el acceso público a Postgres si no lo necesitas.
+Repite la restauración **por cada entorno** que tuviera volcado en el apartado 2. Cuando termines, puedes desactivar de nuevo el acceso público a Postgres si no lo necesitas.
 
 ---
 
 ## 6. Subir los objetos al bucket destino
 
-Tras crear el **nuevo** bucket en el proyecto ya transferido y copiar las nuevas credenciales:
+Tras crear el **nuevo** bucket en el proyecto ya transferido y copiar las nuevas credenciales, sube los objetos **entorno a entorno**: para cada uno, usa la carpeta local que sincronizaste en el apartado 1 y el bucket destino de **ese** entorno.
 
 ```bash
 export AWS_ACCESS_KEY_ID="AKIA_EXAMPLE_DESTINO"
@@ -156,13 +169,13 @@ aws s3 sync ./ "s3://NOMBRE_BUCKET_DESTINO/" \
   --region="REGION"
 ```
 
-Fíjate en el **espacio** antes de `--endpoint-url` y en la **barra final** en `s3://NOMBRE_BUCKET_DESTINO/` para sincronizar el prefijo correctamente.
+Fíjate en el **espacio** antes de `--endpoint-url` y en la **barra final** en `s3://NOMBRE_BUCKET_DESTINO/` para sincronizar el prefijo correctamente. Repite el bloque para staging, preview, etc., cambiando carpeta local, credenciales si cambian y `NOMBRE_BUCKET_DESTINO`.
 
 ---
 
 ## 7. Actualizar URLs guardadas en base de datos
 
-Este paso **no es universal**: depende de **qué framework y ORM** uses y de **dónde** guardáis las URLs del bucket (columnas de texto, JSON, etc.). Lo habitual es sustituir el segmento del bucket antiguo (o el host) por el del bucket nuevo en todas las filas afectadas.
+Este paso **no es universal**: depende de **qué framework y ORM** uses y de **dónde** guardáis las URLs del bucket (columnas de texto, JSON, etc.). Lo habitual es sustituir el segmento del bucket antiguo (o el host) por el del bucket nuevo en todas las filas afectadas. Si tenéis varias bases (una por entorno), repetid la operación o el script **contra cada base** que corresponda.
 
 **Importante:** no existe un comando genérico reutilizable entre repositorios. Hay que **crear e implementar en el proyecto concreto** la herramienta que aplique el reemplazo (comando de gestión de Django, script con Prisma, migración SQL versionada, job puntual, etc.), acotada a vuestros modelos y columnas.
 
@@ -188,12 +201,12 @@ Tras cualquier stack, desplegad y probad subida/descarga de ficheros y los flujo
 ## Checklist rápida
 
 - [ ] Sync bucket **por cada entorno** guardado en disco.
-- [ ] `backup.dump` creado y comprobado (`pg_restore -l`).
+- [ ] Volcado PostgreSQL **por cada entorno** (`backup-ENTORNO.dump`) creado y comprobado (`pg_restore -l`).
 - [ ] Plan y permisos GitHub en destino OK.
 - [ ] Proyecto transferido; variables revisadas.
-- [ ] Postgres verificado o restaurado.
-- [ ] Sync al bucket **nuevo** completado.
-- [ ] URLs en BD alineadas con el bucket nuevo (comando o script **creado en el proyecto**).
+- [ ] Postgres verificado o restaurado **en cada entorno** que correspondía.
+- [ ] Sync al bucket **nuevo** completado **por cada entorno**.
+- [ ] URLs en BD alineadas con el bucket nuevo **en cada entorno** (comando o script **creado en el proyecto**).
 - [ ] Credenciales locales **unset** o terminal cerrada.
 
 ---
