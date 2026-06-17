@@ -1,0 +1,217 @@
+# Tutorial: traspaso de proyecto Railway entre cuentas o workspaces
+
+Guía práctica para mover un proyecto (servicios, base de datos y bucket) cuando Railway **no permite transferir buckets** entre workspaces o cuando quieres una copia local fiable antes de cualquier operación destructiva. Los backups de **bucket** y de **PostgreSQL** deben cubrir **todos los entornos** que uséis (producción, staging, etc.), no solo uno.
+
+> **Seguridad:** en este documento todas las claves, tokens y contraseñas son **ejemplos ficticios**. Sustituye cada marcador por los valores reales de tu panel de Railway o de tu proveedor, y **nunca** subas a Git archivos `.env` con credenciales.
+
+---
+
+## Resumen de lo que vas a hacer
+
+| Fase | Acción |
+|------|--------|
+| 1 | Descargar objetos de **todos** los buckets (por entorno) con la CLI de AWS |
+| 2 | Volcar **cada** base de datos PostgreSQL (`pg_dump`), **un volcado por entorno** que tengáis |
+| 3 | Comprobar plan Pro y acceso GitHub del destino |
+| 4 | Transferir el proyecto desde **Settings** (eliminando el bucket en origen si Railway lo exige) |
+| 5 | Revisar variables de entorno y datos en PostgreSQL (**por entorno**) |
+| 6 | Subir objetos a **cada** bucket nuevo (uno por entorno) |
+| 7 | Actualizar URLs persistidas en BD (**depende del stack**; el comando o script lo creas en el repositorio del proyecto; **por entorno** si hay varias bases) |
+
+---
+
+## Requisitos previos
+
+- **AWS CLI v2** instalada (`aws --version`).
+- **Cliente PostgreSQL** (`pg_dump` / `pg_restore`) con versión **compatible o superior** a la del servidor (por ejemplo PostgreSQL 15 u 17 en local para un servidor 15).
+- Acceso al **dashboard de Railway** en origen y destino.
+- Repositorio en GitHub: la cuenta o workspace destino debe poder **conectar el mismo repo** que usa el despliegue automático.
+
+---
+
+## 1. Backup del bucket en todos los entornos
+
+Railway puede tener **un bucket por entorno** (producción, staging, etc.). Repite esta sección para **cada** combinación entorno + bucket que quieras conservar.
+
+### 1.1. Credenciales en la terminal (solo sesión actual)
+
+En macOS o Linux, exporta las claves que aparecen en el bucket de Railway (pestaña **Credentials** o variables tipo `ACCESS_KEY_ID` / `SECRET_ACCESS_KEY`). **No pegues credenciales reales en documentación ni en commits.**
+
+```bash
+export AWS_ACCESS_KEY_ID="AKIA_EXAMPLE_REPLACE_ME"
+export AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+```
+
+En Windows (PowerShell) el equivalente sería `$env:AWS_ACCESS_KEY_ID="..."`.
+
+> **Buena práctica:** al terminar la sesión, cierra la terminal o ejecuta `unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY` para no dejar claves en variables de entorno.
+
+### 1.2. Carpeta local por entorno
+
+Crea una carpeta por bucket o por entorno, por ejemplo:
+
+```bash
+mkdir -p ~/backups/railway/prod-bucket
+cd ~/backups/railway/prod-bucket
+```
+
+### 1.3. Sincronizar objetos desde Railway (origen)
+
+Sustituye:
+
+- `NOMBRE_BUCKET_ORIGEN` — nombre del bucket en la API S3 (en Railway suele ser algo como `mi-proyecto-xxxxxx`).
+- `ENDPOINT` — URL del endpoint (en documentación actual de Railway suele ser `https://storage.railway.app`; si tu panel indica otro, úsalo tal cual).
+- `REGION` — la región que indique el panel (a veces `auto` no es válida para la CLI; si falla, prueba la región que muestre Railway, por ejemplo `us-east-1`).
+
+```bash
+aws s3 sync "s3://NOMBRE_BUCKET_ORIGEN/" ./ \
+  --endpoint-url="https://ENDPOINT_SIN_BARRA_FINAL" \
+  --region="REGION"
+```
+
+Comprueba que la carpeta tiene tamaño y número de archivos razonables antes de borrar nada en la nube.
+
+---
+
+## 2. Backup de la base de datos en todos los entornos
+
+Igual que con los buckets, en Railway puede haber **un servicio PostgreSQL por entorno** (producción, staging, preview, etc.) o varias bases que debáis conservar. **Repite este apartado por cada entorno** del que necesitéis copia: usa la URL pública de **ese** Postgres y guarda un fichero de volcado **distinto** por entorno para no mezclar datos.
+
+### 2.1. URL pública de PostgreSQL
+
+En el servicio **PostgreSQL** del entorno concreto, activa **Public Networking** si hace falta y copia la **`DATABASE_PUBLIC_URL`** (no uses la URL interna `*.railway.internal` desde tu ordenador).
+
+### 2.2. Carpeta local y nombre del volcado por entorno
+
+Organiza los dumps como hiciste con los buckets, por ejemplo:
+
+```bash
+mkdir -p ~/backups/railway/dumps-prod
+cd ~/backups/railway/dumps-prod
+```
+
+Usa un nombre de archivo que identifique el entorno (`backup-prod.dump`, `backup-staging.dump`, etc.).
+
+### 2.3. Volcado en formato custom
+
+Desde la carpeta del entorno:
+
+```bash
+pg_dump -Fc "postgresql://USUARIO:CONTRASEÑA@HOST_PUBLICO:PUERTO/BASE_DE_DATOS" > backup-ENTORNO.dump
+```
+
+Ejemplo **anonimizado** (sustituye por tu cadena real):
+
+```bash
+pg_dump -Fc "postgresql://postgres:REDACTED@monorail.proxy.rlwy.net:12345/railway" > backup-prod.dump
+```
+
+Opcional: validar el dump sin restaurar:
+
+```bash
+pg_restore -l backup-prod.dump | head
+```
+
+---
+
+## 3. Cuenta destino y repositorio
+
+- El **workspace o usuario destino** debe tener plan **Pro** (o el plan que exija Railway para transferencia y recursos), alineado con el origen si Railway lo exige en el modal de transferencia.
+- En GitHub (o GitLab), asegura que la **cuenta u organización destino** tiene permisos sobre el repositorio que Railway usará para builds y despliegues.
+
+---
+
+## 4. Transferir el proyecto
+
+1. En Railway: **Project → Settings** y usa la opción de transferencia que corresponda (**Transfer Project** entre workspaces o **Transfer Ownership** a otro usuario, según tu caso).
+2. Si el modal indica que **los buckets no se transfieren**, elimina el bucket en el proyecto de origen **solo después** de tener el backup del apartado 1 verificado. Del mismo modo, no des por cerrada la migración sin haber completado los volcados del apartado 2 **para todos los entornos** que deban conservarse.
+3. El destinatario debe **aceptar** la transferencia dentro del plazo que indique Railway (por ejemplo 24 h en transferencias a otro usuario).
+
+---
+
+## 5. Post-transferencia: variables y base de datos
+
+### 5.1. Variables de entorno
+
+Revisa **en cada entorno** del proyecto transferido el servicio de la aplicación (y el Postgres de ese entorno, si aplica) y comprueba, entre otras:
+
+- Conexión a base de datos (`DATABASE_URL` o variables equivalentes).
+- Credenciales del **nuevo** bucket (`RAILWAY_BUCKET_*`, o las que use tu `settings` / preset de Railway).
+
+### 5.2. Comprobar datos en PostgreSQL
+
+Si la base de datos **no** llegó completa o el servicio es nuevo, restaura el volcado correspondiente usando la **URL pública** del Postgres **destino de ese mismo entorno** (staging con dump de staging, producción con dump de producción, etc.):
+
+```bash
+cd ~/backups/railway/dumps-prod
+pg_restore -d "postgresql://postgres:REDACTED@monorail.proxy.rlwy.net:99999/railway" \
+  --no-owner --no-privileges --clean --if-exists \
+  backup-prod.dump
+```
+
+- `--no-owner` y `--no-privileges` evitan choques con usuarios distintos al origen.
+- `--clean --if-exists` ayuda si el destino ya tenía esquema creado por migraciones.
+
+Repite la restauración **por cada entorno** que tuviera volcado en el apartado 2. Cuando termines, puedes desactivar de nuevo el acceso público a Postgres si no lo necesitas.
+
+---
+
+## 6. Subir los objetos al bucket destino
+
+Tras crear el **nuevo** bucket en el proyecto ya transferido y copiar las nuevas credenciales, sube los objetos **entorno a entorno**: para cada uno, usa la carpeta local que sincronizaste en el apartado 1 y el bucket destino de **ese** entorno.
+
+```bash
+export AWS_ACCESS_KEY_ID="AKIA_EXAMPLE_DESTINO"
+export AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI_K7MDENG_bPxRfiCY_EXAMPLE_DESTINO"
+cd ~/backups/railway/prod-bucket
+aws s3 sync ./ "s3://NOMBRE_BUCKET_DESTINO/" \
+  --endpoint-url="https://ENDPOINT_DESTINO" \
+  --region="REGION"
+```
+
+Fíjate en el **espacio** antes de `--endpoint-url` y en la **barra final** en `s3://NOMBRE_BUCKET_DESTINO/` para sincronizar el prefijo correctamente. Repite el bloque para staging, preview, etc., cambiando carpeta local, credenciales si cambian y `NOMBRE_BUCKET_DESTINO`.
+
+---
+
+## 7. Actualizar URLs guardadas en base de datos
+
+Este paso **no es universal**: depende de **qué framework y ORM** uses y de **dónde** guardáis las URLs del bucket (columnas de texto, JSON, etc.). Lo habitual es sustituir el segmento del bucket antiguo (o el host) por el del bucket nuevo en todas las filas afectadas. Si tenéis varias bases (una por entorno), repetid la operación o el script **contra cada base** que corresponda.
+
+**Importante:** no existe un comando genérico reutilizable entre repositorios. Hay que **crear e implementar en el proyecto concreto** la herramienta que aplique el reemplazo (comando de gestión de Django, script con Prisma, migración SQL versionada, job puntual, etc.), acotada a vuestros modelos y columnas.
+
+### Patrón recomendado
+
+1. Inventariar tablas y campos que almacenan URLs del storage antiguo.
+2. Implementar el cambio en el repo del backend (por ejemplo un `manage.py` custom con `--dry-run` en Django, o un script npm que lea `DATABASE_URL`).
+3. Probar primero en copia de datos o con modo simulación si lo implementáis.
+4. Ejecutar en el entorno afectado y validar subida, descarga y enlaces.
+
+### Django
+
+Un enlace habitual es un **comando de gestión** (`management/commands/...`) que recorra los modelos con `URLField` o texto con URLs y sustituya el prefijo del bucket o del host. Añade flags como `--dry-run` y, si aplica, `--bucket` para forzar el nombre nuevo. Este comando **no viene dado por el handbook**: lo escribís en el proyecto donde viváis los datos.
+
+### Node (p. ej. Prisma)
+
+Con **Prisma** (u otro cliente SQL), un **seed** (`prisma/seed.ts`) o un script dedicado puede ejecutar `UPDATE` masivos sobre las tablas/columnas afectadas. El equivalente con TypeORM, Drizzle, Knex, etc. sigue la misma idea: script versionado en **ese** repositorio.
+
+Tras cualquier stack, desplegad y probad subida/descarga de ficheros y los flujos que lean esas URLs.
+
+---
+
+## Checklist rápida
+
+- [ ] Sync bucket **por cada entorno** guardado en disco.
+- [ ] Volcado PostgreSQL **por cada entorno** (`backup-ENTORNO.dump`) creado y comprobado (`pg_restore -l`).
+- [ ] Plan y permisos GitHub en destino OK.
+- [ ] Proyecto transferido; variables revisadas.
+- [ ] Postgres verificado o restaurado **en cada entorno** que correspondía.
+- [ ] Sync al bucket **nuevo** completado **por cada entorno**.
+- [ ] URLs en BD alineadas con el bucket nuevo **en cada entorno** (comando o script **creado en el proyecto**).
+- [ ] Credenciales locales **unset** o terminal cerrada.
+
+---
+
+## Notas finales
+
+- Las **URLs firmadas** (presigned) en base de datos no deben “parchearse” a ciegas: lo habitual es omitir filas que parezcan firmadas y guardar URLs canónicas del bucket, generando firmas al vuelo en la API. Aplica el mismo criterio en vuestro script de migración.
+- Si Railway cambia el endpoint o el estilo de URL (path vs virtual-hosted), revisad la configuración del bucket y el patrón de reemplazo en el código que hayáis añadido al proyecto para esta migración.
